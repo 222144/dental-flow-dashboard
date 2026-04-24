@@ -1,15 +1,24 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { AppSidebar } from "./AppSidebar";
-import { Bell, Search } from "lucide-react";
+import { Bell, Menu, Search } from "lucide-react";
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
-      <AppSidebar />
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur">
+      <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="md:pl-64">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-card/80 px-4 backdrop-blur sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 md:flex">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted md:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 lg:flex">
               <Search className="h-4 w-4 text-muted-foreground" />
               <input
                 placeholder="Quick search…"
@@ -25,7 +34,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="h-9 w-9 rounded-full bg-[image:var(--gradient-primary)]" />
           </div>
         </header>
-        <main className="p-6 lg:p-8">{children}</main>
+        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );
