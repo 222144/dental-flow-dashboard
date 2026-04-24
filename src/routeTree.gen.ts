@@ -13,7 +13,7 @@ import { Route as XrayRouteImport } from './routes/xray'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as DoctorsRouteImport } from './routes/doctors'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PatientsIndexRouteImport } from './routes/patients.index'
+import { Route as PatientsIndexRouteImport } from './routes/patients/index'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 
 const XrayRoute = XrayRouteImport.update({

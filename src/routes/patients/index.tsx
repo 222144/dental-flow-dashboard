@@ -3,7 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { DataTable } from "@/components/data/DataTable";
 import { patients, type Patient } from "@/data/mock";
 
-export const Route = createFileRoute("/patients")({
+export const Route = createFileRoute("/patients/")({
   head: () => ({
     meta: [
       { title: "إدارة المرضى — عيادة الأسنان" },
