@@ -7,8 +7,8 @@ import { Star } from "lucide-react";
 export const Route = createFileRoute("/doctors")({
   head: () => ({
     meta: [
-      { title: "Doctor Management — DentalCare" },
-      { name: "description", content: "Manage doctors, schedules, and specialties." },
+      { title: "إدارة الأطباء — عيادة الأسنان" },
+      { name: "description", content: "إدارة الأطباء، التخصصات، والجداول الأسبوعية." },
     ],
   }),
   component: DoctorsPage,
@@ -18,27 +18,27 @@ function DoctorsPage() {
   return (
     <AppShell>
       <DataTable<Doctor>
-        title="Doctor Management"
-        description="Configure doctor profiles, specialties, and weekly schedules."
-        addLabel="Add New Doctor"
+        title="إدارة الأطباء"
+        description="ضبط ملفات الأطباء والتخصصات والجداول الأسبوعية."
+        addLabel="إضافة طبيب"
         data={doctors}
         searchKeys={["name", "specialty"]}
         columns={[
-          { key: "name", header: "Doctor" },
+          { key: "name", header: "اسم الطبيب" },
           {
             key: "specialty",
-            header: "Specialty",
+            header: "التخصص",
             render: (r) => (
               <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                 {r.specialty}
               </span>
             ),
           },
-          { key: "schedule", header: "Schedule" },
-          { key: "patients", header: "Patients" },
+          { key: "schedule", header: "الجدول" },
+          { key: "patients", header: "عدد المرضى" },
           {
             key: "rating",
-            header: "Rating",
+            header: "التقييم",
             render: (r) => (
               <span className="inline-flex items-center gap-1 font-medium">
                 <Star className="h-3.5 w-3.5 fill-action text-action" />

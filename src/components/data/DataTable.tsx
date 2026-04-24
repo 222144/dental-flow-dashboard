@@ -28,7 +28,7 @@ export function DataTable<T extends { id: string | number }>({
   data,
   columns,
   searchKeys,
-  addLabel = "Add New",
+  addLabel = "إضافة جديد",
   rowLink,
   onEdit,
   onDelete,
@@ -70,7 +70,7 @@ export function DataTable<T extends { id: string | number }>({
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search records…"
+              placeholder="ابحث في السجلات…"
               className="w-full bg-transparent text-sm outline-none"
             />
           </div>
@@ -80,13 +80,13 @@ export function DataTable<T extends { id: string | number }>({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-secondary/60 text-left text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+              <tr className="bg-secondary/60 text-right text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
                 {columns.map((c) => (
                   <th key={String(c.key)} className={`px-5 py-3 ${c.className ?? ""}`}>
                     {c.header}
                   </th>
                 ))}
-                <th className="px-5 py-3 text-right">Actions</th>
+                <th className="px-5 py-3 text-left">الإجراءات</th>
               </tr>
             </thead>
             <tbody>
@@ -114,21 +114,21 @@ export function DataTable<T extends { id: string | number }>({
                       </td>
                     );
                   })}
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-5 py-4 text-left">
                     <div className="inline-flex items-center gap-2">
                       <button
                         onClick={() => onEdit?.(row)}
                         className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90"
                       >
                         <Pencil className="h-3.5 w-3.5" />
-                        Edit
+                        تعديل
                       </button>
                       <button
                         onClick={() => onDelete?.(row)}
                         className="inline-flex items-center gap-1.5 rounded-md bg-action px-3 py-1.5 text-xs font-semibold text-action-foreground transition hover:bg-action-hover"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
-                        Delete
+                        حذف
                       </button>
                     </div>
                   </td>
@@ -140,7 +140,7 @@ export function DataTable<T extends { id: string | number }>({
                     colSpan={columns.length + 1}
                     className="px-5 py-12 text-center text-sm text-muted-foreground"
                   >
-                    No records found.
+                    لا توجد سجلات.
                   </td>
                 </tr>
               )}
@@ -150,14 +150,14 @@ export function DataTable<T extends { id: string | number }>({
 
         <div className="flex items-center justify-between border-t border-border px-5 py-3 text-xs text-muted-foreground">
           <span>
-            Showing <strong>{filtered.length}</strong> of {data.length} records
+            عرض <strong>{filtered.length}</strong> من أصل {data.length} سجل
           </span>
           <div className="flex items-center gap-1">
             <button className="rounded-md border border-border px-2 py-1 hover:bg-muted">
-              Prev
+              السابق
             </button>
             <button className="rounded-md border border-border px-2 py-1 hover:bg-muted">
-              Next
+              التالي
             </button>
           </div>
         </div>
