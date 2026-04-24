@@ -153,8 +153,13 @@
     border-color: var(--color-border);
   }
 
+  html {
+    font-family: "Cairo", "Almarai", system-ui, -apple-system, sans-serif;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Cairo", "Almarai", system-ui, -apple-system, sans-serif;
   }
 }
