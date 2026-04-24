@@ -11,20 +11,20 @@ import {
 
 const navGroups = [
   {
-    label: "Overview",
-    items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard }],
+    label: "نظرة عامة",
+    items: [{ to: "/", label: "لوحة التحكم", icon: LayoutDashboard }],
   },
   {
-    label: "People Management",
+    label: "إدارة الموظفين",
     items: [
-      { to: "/patients", label: "Patient Management", icon: Users },
-      { to: "/users", label: "User Management", icon: UserCog },
-      { to: "/doctors", label: "Doctor Management", icon: Stethoscope },
+      { to: "/patients", label: "إدارة المرضى", icon: Users },
+      { to: "/users", label: "إدارة المستخدمين", icon: UserCog },
+      { to: "/doctors", label: "إدارة الأطباء", icon: Stethoscope },
     ],
   },
   {
-    label: "Diagnostics",
-    items: [{ to: "/xray", label: "AI X-Ray Analysis", icon: ScanLine }],
+    label: "التشخيص الذكي",
+    items: [{ to: "/xray", label: "تحليل الأشعة", icon: ScanLine }],
   },
 ] as const;
 
@@ -39,7 +39,6 @@ export function AppSidebar({
 
   return (
     <>
-      {/* Mobile/tablet overlay */}
       {open && (
         <div
           className="fixed inset-0 z-30 bg-foreground/40 backdrop-blur-sm md:hidden"
@@ -48,8 +47,8 @@ export function AppSidebar({
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidebar text-sidebar-foreground shadow-elevated transition-transform duration-200 md:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 right-0 z-40 flex w-64 flex-col bg-sidebar text-sidebar-foreground shadow-elevated transition-transform duration-200 md:translate-x-0 ${
+          open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex h-16 items-center justify-between gap-3 border-b border-sidebar-border px-6">
@@ -58,14 +57,14 @@ export function AppSidebar({
               <Activity className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <p className="text-sm font-semibold tracking-tight">DentalCare</p>
-              <p className="text-xs text-sidebar-foreground/70">Clinic Suite</p>
+              <p className="text-sm font-semibold tracking-tight">عيادة الأسنان</p>
+              <p className="text-xs text-sidebar-foreground/70">لوحة المسؤول</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="rounded-md p-1.5 text-sidebar-foreground/70 hover:bg-sidebar-accent md:hidden"
-            aria-label="Close menu"
+            aria-label="إغلاق القائمة"
           >
             <X className="h-5 w-5" />
           </button>
@@ -108,8 +107,8 @@ export function AppSidebar({
 
         <div className="border-t border-sidebar-border p-4">
           <div className="rounded-lg bg-sidebar-accent/50 p-3">
-            <p className="text-xs font-medium">Logged in as</p>
-            <p className="text-sm font-semibold">Dr. Admin</p>
+            <p className="text-xs font-medium">مسجل الدخول كـ</p>
+            <p className="text-sm font-semibold">المسؤول العام</p>
           </div>
         </div>
       </aside>

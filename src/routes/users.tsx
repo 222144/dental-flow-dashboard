@@ -6,34 +6,35 @@ import { users, type AppUser } from "@/data/mock";
 export const Route = createFileRoute("/users")({
   head: () => ({
     meta: [
-      { title: "User Management — DentalCare" },
-      { name: "description", content: "Manage admins, doctors, and secretaries." },
+      { title: "إدارة المستخدمين — عيادة الأسنان" },
+      { name: "description", content: "إدارة حسابات الأطباء والسكرتارية والمحاسبين." },
     ],
   }),
   component: UsersPage,
 });
 
 const roleStyles: Record<AppUser["role"], string> = {
-  Admin: "bg-action/15 text-action",
-  Doctor: "bg-primary/15 text-primary",
-  Secretary: "bg-secondary text-secondary-foreground",
+  "مسؤول": "bg-action/15 text-action",
+  "طبيب": "bg-primary/15 text-primary",
+  "سكرتيرة": "bg-secondary text-secondary-foreground",
+  "محاسب": "bg-accent text-accent-foreground",
 };
 
 function UsersPage() {
   return (
     <AppShell>
       <DataTable<AppUser>
-        title="User Management"
-        description="Manage system accounts and assign roles: Admin, Doctor, Secretary."
-        addLabel="Add New User"
+        title="إدارة المستخدمين"
+        description="إدارة حسابات النظام وتعيين الصلاحيات: مسؤول، طبيب، سكرتيرة، محاسب."
+        addLabel="إضافة مستخدم"
         data={users}
         searchKeys={["name", "email", "role"]}
         columns={[
-          { key: "name", header: "Name" },
-          { key: "email", header: "Email" },
+          { key: "name", header: "الاسم" },
+          { key: "email", header: "البريد الإلكتروني" },
           {
             key: "role",
-            header: "Role",
+            header: "الصلاحية",
             render: (r) => (
               <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${roleStyles[r.role]}`}>
                 {r.role}
@@ -42,23 +43,23 @@ function UsersPage() {
           },
           {
             key: "status",
-            header: "Status",
+            header: "الحالة",
             render: (r) => (
               <span
                 className={`inline-flex items-center gap-1.5 text-xs font-medium ${
-                  r.status === "Active" ? "text-success" : "text-action"
+                  r.status === "نشط" ? "text-success" : "text-action"
                 }`}
               >
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
-                    r.status === "Active" ? "bg-success" : "bg-action"
+                    r.status === "نشط" ? "bg-success" : "bg-action"
                   }`}
                 />
                 {r.status}
               </span>
             ),
           },
-          { key: "createdAt", header: "Created" },
+          { key: "createdAt", header: "تاريخ الإنشاء" },
         ]}
       />
     </AppShell>
