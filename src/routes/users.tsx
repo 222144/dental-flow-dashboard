@@ -29,6 +29,11 @@ function UsersPage() {
         addLabel="إضافة مستخدم"
         data={users}
         searchKeys={["name", "email", "role"]}
+        fieldSearchOptions={[
+          { key: "name", label: "الاسم" },
+          { key: "status", label: "الحالة" },
+          { key: "email", label: "الإيميل" },
+        ]}
         columns={[
           { key: "name", header: "الاسم" },
           { key: "email", header: "البريد الإلكتروني" },
