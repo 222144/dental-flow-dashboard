@@ -304,65 +304,6 @@ export function DataTable<T extends { id: string | number }>({
           </div>
         </div>
       </div>
-      <Dialog open={Boolean(dialogMode && activeRow)} onOpenChange={(open) => !open && closeDialog()}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto text-right sm:max-w-2xl" dir="rtl">
-          <DialogHeader className="text-right">
-            <DialogTitle>{dialogMode === "edit" ? "تعديل بيانات السجل" : "عرض تفاصيل السجل"}</DialogTitle>
-            <DialogDescription>
-              {dialogMode === "edit"
-                ? "تظهر هنا حقول التعديل الأساسية لهذا السجل."
-                : "تظهر هنا كل بيانات الصف المختار بشكل منظم للقراءة."}
-            </DialogDescription>
-          </DialogHeader>
-
-          {activeRow && dialogMode === "view" && (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {columns.map((column) => (
-                <div key={String(column.key)} className="rounded-lg border border-border bg-muted/30 p-3">
-                  <p className="text-xs font-semibold text-muted-foreground">{column.header}</p>
-                  <div className="mt-1 text-sm font-medium text-foreground">
-                    {column.render ? column.render(activeRow) : String((activeRow as any)[column.key] ?? "—")}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeRow && dialogMode === "edit" && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {columns.map((column) => (
-                <label key={String(column.key)} className="space-y-2 text-sm font-medium text-foreground">
-                  <span>{column.header}</span>
-                  <input
-                    value={draft[String(column.key)] ?? ""}
-                    onChange={(event) =>
-                      setDraft((current) => ({ ...current, [String(column.key)]: event.target.value }))
-                    }
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-
-          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
-            <button
-              onClick={closeDialog}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
-            >
-              إغلاق
-            </button>
-            {dialogMode === "edit" && (
-              <button
-                onClick={closeDialog}
-                className="rounded-lg bg-[image:var(--gradient-action)] px-4 py-2 text-sm font-semibold text-action-foreground shadow-md hover:brightness-105"
-              >
-                حفظ التعديلات
-              </button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       <Dialog open={Boolean(rowToDelete)} onOpenChange={(open) => !open && setRowToDelete(null)}>
         <DialogContent className="text-right sm:max-w-md" dir="rtl">
           <DialogHeader className="text-right">
