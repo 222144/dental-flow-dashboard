@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { ArrowRight, Eye, Search, Plus, Pencil, Trash2 } from "lucide-react";
+import { Eye, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -90,13 +90,6 @@ export function DataTable<T extends { id: string | number }>({
       <section className="space-y-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <button
-              onClick={closeDialog}
-              className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
-              aria-label="رجوع"
-            >
-              <ArrowRight className="h-4 w-4" />
-            </button>
             <div>
               <p className="text-xs font-semibold text-action">
                 {dialogMode === "edit" ? "تعديل السجل" : "عرض السجل"}
