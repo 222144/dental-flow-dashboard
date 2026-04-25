@@ -16,12 +16,18 @@ export type Column<T> = {
   className?: string;
 };
 
+export type FieldSearchOption<T> = {
+  key: keyof T;
+  label: string;
+};
+
 type Props<T> = {
   title: string;
   description?: string;
   data: T[];
   columns: Column<T>[];
   searchKeys: (keyof T)[];
+  fieldSearchOptions?: FieldSearchOption<T>[];
   addLabel?: string;
   rowLink?: (row: T) => string;
   onEdit?: (row: T) => void;
@@ -35,6 +41,7 @@ export function DataTable<T extends { id: string | number }>({
   data,
   columns,
   searchKeys,
+  fieldSearchOptions,
   addLabel = "إضافة جديد",
   rowLink,
   onEdit,
@@ -42,6 +49,7 @@ export function DataTable<T extends { id: string | number }>({
   filters,
 }: Props<T>) {
   const [query, setQuery] = useState("");
+  const [selectedSearchKey, setSelectedSearchKey] = useState<keyof T | "none">("none");
   const [dialogMode, setDialogMode] = useState<"view" | "edit" | null>(null);
   const [activeRow, setActiveRow] = useState<T | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
@@ -49,12 +57,18 @@ export function DataTable<T extends { id: string | number }>({
   const filtered = data.filter((row) =>
     query.trim() === ""
       ? true
-      : searchKeys.some((k) =>
-          String(row[k] ?? "")
+      : selectedSearchKey !== "none"
+        ? String(row[selectedSearchKey] ?? "")
             .toLowerCase()
-            .includes(query.toLowerCase()),
-        ),
+            .includes(query.toLowerCase())
+        : searchKeys.some((k) =>
+            String(row[k] ?? "")
+              .toLowerCase()
+              .includes(query.toLowerCase()),
+          ),
   );
+
+  const hasFieldSearch = Boolean(fieldSearchOptions?.length);
 
   const openDialog = (mode: "view" | "edit", row: T) => {
     setDialogMode(mode);
@@ -89,14 +103,35 @@ export function DataTable<T extends { id: string | number }>({
 
       <div className="rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
         <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="ابحث في السجلات…"
-              className="w-full bg-transparent text-sm outline-none"
-            />
+          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+            {hasFieldSearch && (
+              <select
+                value={String(selectedSearchKey)}
+                onChange={(event) => {
+                  setSelectedSearchKey(event.target.value === "none" ? "none" : (event.target.value as keyof T));
+                  setQuery("");
+                }}
+                className="h-10 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="none">لا شيء</option>
+                {fieldSearchOptions?.map((option) => (
+                  <option key={String(option.key)} value={String(option.key)}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            )}
+            {(!hasFieldSearch || selectedSearchKey !== "none") && (
+              <div className="flex flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="ابحث في السجلات…"
+                  className="w-full bg-transparent text-sm outline-none"
+                />
+              </div>
+            )}
           </div>
           {filters}
         </div>
