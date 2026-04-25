@@ -52,6 +52,7 @@ export function DataTable<T extends { id: string | number }>({
   const [selectedSearchKey, setSelectedSearchKey] = useState<keyof T | "none">("none");
   const [dialogMode, setDialogMode] = useState<"view" | "edit" | null>(null);
   const [activeRow, setActiveRow] = useState<T | null>(null);
+  const [rowToDelete, setRowToDelete] = useState<T | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
 
   const filtered = data.filter((row) =>
@@ -190,7 +191,7 @@ export function DataTable<T extends { id: string | number }>({
                         تعديل
                       </button>
                       <button
-                        onClick={() => onDelete?.(row)}
+                         onClick={() => setRowToDelete(row)}
                         className="inline-flex items-center gap-1.5 rounded-md bg-action px-3 py-1.5 text-xs font-semibold text-action-foreground transition hover:bg-action-hover"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -284,6 +285,36 @@ export function DataTable<T extends { id: string | number }>({
                 حفظ التعديلات
               </button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={Boolean(rowToDelete)} onOpenChange={(open) => !open && setRowToDelete(null)}>
+        <DialogContent className="text-right sm:max-w-md" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>هل أنت متأكد؟</DialogTitle>
+            <DialogDescription>
+              سيتم حذف هذا السجل من الجدول. لا يمكن التراجع عن هذا الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <button
+              onClick={() => setRowToDelete(null)}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
+            >
+              إلغاء
+            </button>
+            <button
+              onClick={() => {
+                if (rowToDelete) {
+                  onDelete?.(rowToDelete);
+                }
+                setRowToDelete(null);
+              }}
+              className="rounded-lg bg-action px-4 py-2 text-sm font-semibold text-action-foreground hover:bg-action-hover"
+            >
+              تأكيد الحذف
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
