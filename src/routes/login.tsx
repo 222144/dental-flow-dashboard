@@ -1,10 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck, Tooth } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+function ToothLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M7.9 3.25c1.28 0 2.16.68 3.04 1.17.4.22.72.34 1.06.34s.66-.12 1.06-.34c.88-.49 1.76-1.17 3.04-1.17 2.12 0 3.65 1.66 3.65 4.02 0 1.43-.54 2.63-1.1 3.86-.5 1.1-.75 2.22-.96 3.43-.45 2.55-1.19 5.69-3.23 5.69-1.16 0-1.45-1.1-1.73-2.2-.22-.85-.42-1.64-.73-1.64s-.51.79-.73 1.64c-.28 1.1-.57 2.2-1.73 2.2-2.04 0-2.78-3.14-3.23-5.69-.21-1.21-.46-2.33-.96-3.43-.56-1.23-1.1-2.43-1.1-3.86 0-2.36 1.53-4.02 3.65-4.02Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 6.35c.86.43 1.7.65 2.8.65s1.94-.22 2.8-.65"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export const Route = createFileRoute("/login")({
   head: () => ({
