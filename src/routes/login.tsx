@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck, Stethoscope } from "lucide-react";
+import { ShieldCheck, Tooth } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +27,7 @@ function LoginPage() {
         <div className="relative flex h-full flex-col justify-between p-10 text-primary-foreground">
           <div className="inline-flex w-fit items-center gap-3 rounded-md bg-primary-foreground/15 px-4 py-3 backdrop-blur">
             <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary-foreground/20">
-              <Stethoscope className="h-6 w-6" />
+              <Tooth className="h-6 w-6" />
             </div>
             <div>
               <p className="text-sm font-medium opacity-90">نظام العيادة</p>
@@ -69,7 +69,7 @@ function LoginPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:hidden">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Stethoscope className="h-7 w-7" />
+              <Tooth className="h-7 w-7" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">لوحة تحكم الأسنان</h1>
           </div>
