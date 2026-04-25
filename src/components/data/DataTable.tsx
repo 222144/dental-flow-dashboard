@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Eye, Search, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowRight, Eye, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -84,6 +84,81 @@ export function DataTable<T extends { id: string | number }>({
     setActiveRow(null);
     setDraft({});
   };
+
+  if (dialogMode && activeRow) {
+    return (
+      <section className="space-y-6">
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={closeDialog}
+              className="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              aria-label="رجوع"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+            <div>
+              <p className="text-xs font-semibold text-action">
+                {dialogMode === "edit" ? "تعديل السجل" : "عرض السجل"}
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+                {String((activeRow as any).name ?? title)}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {dialogMode === "edit"
+                  ? "يمكنك تعديل البيانات الأساسية ثم حفظ التغييرات."
+                  : "معلومات السجل المختار معروضة داخل الصفحة بدون نافذة."}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={closeDialog}
+            className="inline-flex items-center justify-center rounded-lg border border-border px-5 py-2.5 text-sm font-semibold transition hover:bg-muted"
+          >
+            رجوع
+          </button>
+        </div>
+
+        {dialogMode === "view" ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {columns.map((column) => (
+              <div key={String(column.key)} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+                <p className="text-xs font-semibold text-muted-foreground">{column.header}</p>
+                <div className="mt-2 text-base font-semibold text-foreground">
+                  {column.render ? column.render(activeRow) : String((activeRow as any)[column.key] ?? "—")}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {columns.map((column) => (
+                <label key={String(column.key)} className="space-y-2 text-sm font-medium text-foreground">
+                  <span>{column.header}</span>
+                  <input
+                    value={draft[String(column.key)] ?? ""}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, [String(column.key)]: event.target.value }))
+                    }
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus:ring-2 focus:ring-ring"
+                  />
+                </label>
+              ))}
+            </div>
+            <div className="mt-6 flex items-center gap-2">
+              <button onClick={closeDialog} className="rounded-lg border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">
+                إلغاء
+              </button>
+              <button onClick={closeDialog} className="rounded-lg bg-[image:var(--gradient-action)] px-5 py-2.5 text-sm font-semibold text-action-foreground shadow-md hover:brightness-105">
+                حفظ التعديلات
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-6">
