@@ -1,6 +1,13 @@
 import { ReactNode, useState } from "react";
-import { Search, Plus, Pencil, Trash2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Eye, Search, Plus, Pencil, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -35,6 +42,9 @@ export function DataTable<T extends { id: string | number }>({
   filters,
 }: Props<T>) {
   const [query, setQuery] = useState("");
+  const [dialogMode, setDialogMode] = useState<"view" | "edit" | null>(null);
+  const [activeRow, setActiveRow] = useState<T | null>(null);
+  const [draft, setDraft] = useState<Record<string, string>>({});
 
   const filtered = data.filter((row) =>
     query.trim() === ""
@@ -45,6 +55,20 @@ export function DataTable<T extends { id: string | number }>({
             .includes(query.toLowerCase()),
         ),
   );
+
+  const openDialog = (mode: "view" | "edit", row: T) => {
+    setDialogMode(mode);
+    setActiveRow(row);
+    setDraft(
+      Object.fromEntries(columns.map((column) => [String(column.key), String((row as any)[column.key] ?? "")])),
+    );
+  };
+
+  const closeDialog = () => {
+    setDialogMode(null);
+    setActiveRow(null);
+    setDraft({});
+  };
 
   return (
     <section className="space-y-6">
@@ -102,12 +126,9 @@ export function DataTable<T extends { id: string | number }>({
                     return (
                       <td key={String(c.key)} className="px-5 py-4 align-middle">
                         {rowLink && c === columns[0] ? (
-                          <Link
-                            to={rowLink(row)}
-                            className="font-medium text-primary hover:underline"
-                          >
+                          <a href={rowLink(row)} className="font-medium text-primary hover:underline">
                             {content}
-                          </Link>
+                          </a>
                         ) : (
                           content
                         )}
@@ -116,8 +137,18 @@ export function DataTable<T extends { id: string | number }>({
                   })}
                   <td className="px-5 py-4 text-left">
                     <div className="inline-flex items-center gap-2">
+                       <button
+                         onClick={() => openDialog("view", row)}
+                         className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-xs font-semibold text-secondary-foreground transition hover:bg-secondary/80"
+                       >
+                         <Eye className="h-3.5 w-3.5" />
+                         عرض
+                       </button>
                       <button
-                        onClick={() => onEdit?.(row)}
+                         onClick={() => {
+                           onEdit?.(row);
+                           openDialog("edit", row);
+                         }}
                         className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -162,6 +193,65 @@ export function DataTable<T extends { id: string | number }>({
           </div>
         </div>
       </div>
+      <Dialog open={Boolean(dialogMode && activeRow)} onOpenChange={(open) => !open && closeDialog()}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto text-right sm:max-w-2xl" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>{dialogMode === "edit" ? "تعديل بيانات السجل" : "عرض تفاصيل السجل"}</DialogTitle>
+            <DialogDescription>
+              {dialogMode === "edit"
+                ? "تظهر هنا حقول التعديل الأساسية لهذا السجل."
+                : "تظهر هنا كل بيانات الصف المختار بشكل منظم للقراءة."}
+            </DialogDescription>
+          </DialogHeader>
+
+          {activeRow && dialogMode === "view" && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {columns.map((column) => (
+                <div key={String(column.key)} className="rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold text-muted-foreground">{column.header}</p>
+                  <div className="mt-1 text-sm font-medium text-foreground">
+                    {column.render ? column.render(activeRow) : String((activeRow as any)[column.key] ?? "—")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeRow && dialogMode === "edit" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {columns.map((column) => (
+                <label key={String(column.key)} className="space-y-2 text-sm font-medium text-foreground">
+                  <span>{column.header}</span>
+                  <input
+                    value={draft[String(column.key)] ?? ""}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, [String(column.key)]: event.target.value }))
+                    }
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </label>
+              ))}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <button
+              onClick={closeDialog}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
+            >
+              إغلاق
+            </button>
+            {dialogMode === "edit" && (
+              <button
+                onClick={closeDialog}
+                className="rounded-lg bg-[image:var(--gradient-action)] px-4 py-2 text-sm font-semibold text-action-foreground shadow-md hover:brightness-105"
+              >
+                حفظ التعديلات
+              </button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
