@@ -1,99 +1,222 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { ArrowRight, CreditCard, FileText, HeartPulse, Loader2, UserRound } from "lucide-react";
+import { toast } from "sonner";
+
 import { AppShell } from "@/components/layout/AppShell";
-import { patients, medicalRecords, type MedicalRecord } from "@/data/mock";
-import { ArrowRight, FileText, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/patients/$patientId")({
-  loader: ({ params }) => {
-    const patient = patients.find((p) => p.id === params.patientId);
-    if (!patient) throw notFound();
-    const records: MedicalRecord[] = medicalRecords[patient.id] ?? [];
-    return { patient, records };
-  },
-  head: ({ loaderData }) => ({
+  head: () => ({
     meta: [
-      { title: `${loaderData?.patient.name ?? "مريض"} — السجل الطبي` },
-      { name: "description", content: "السجل الطبي للمريض، التشخيصات وخطط العلاج." },
+      { title: "الملف الطبي — عيادة الأسنان" },
+      { name: "description", content: "عرض ملف المريض الطبي والأمراض المزمنة والفواتير." },
     ],
   }),
-  notFoundComponent: () => (
-    <AppShell>
-      <div className="rounded-2xl border border-border bg-card p-10 text-center">
-        <h2 className="text-xl font-semibold">المريض غير موجود</h2>
-        <Link to="/patients" className="mt-4 inline-block text-primary hover:underline">
-          العودة إلى قائمة المرضى
-        </Link>
-      </div>
-    </AppShell>
-  ),
   component: PatientDetail,
 });
 
+type PatientRow = {
+  id: string;
+  patient_number: string;
+  full_name: string;
+  age: number | null;
+  gender: string;
+  phone: string;
+  address: string;
+  chronic_diseases: string;
+  notes: string;
+  status: string;
+  last_visit: string;
+};
+
+type InvoiceRow = {
+  id: string;
+  invoice_number: string;
+  description: string;
+  amount: number;
+  currency: string;
+  payment_status: "paid" | "pending";
+  payment_method: "cash" | "card";
+  paid_at: string | null;
+  due_date: string;
+};
+
+function paymentStatusLabel(status: InvoiceRow["payment_status"]) {
+  return status === "paid" ? "مدفوعة" : "غير مدفوعة بعد";
+}
+
+function paymentMethodLabel(method: InvoiceRow["payment_method"]) {
+  return method === "cash" ? "Cash" : "بطاقة";
+}
+
 function PatientDetail() {
-  const { patient, records } = Route.useLoaderData();
+  const { patientId } = Route.useParams();
+  const [patient, setPatient] = useState<PatientRow | null>(null);
+  const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPatient() {
+      setLoading(true);
+      const [{ data: patientData, error: patientError }, { data: invoiceData, error: invoiceError }] = await Promise.all([
+        (supabase as any)
+          .from("patients")
+          .select("id, patient_number, full_name, age, gender, phone, address, chronic_diseases, notes, status, last_visit")
+          .eq("id", patientId)
+          .maybeSingle(),
+        (supabase as any)
+          .from("patient_invoices")
+          .select("id, invoice_number, description, amount, currency, payment_status, payment_method, paid_at, due_date")
+          .eq("patient_id", patientId)
+          .order("created_at", { ascending: false }),
+      ]);
+
+      if (patientError || invoiceError) {
+        toast.error("تعذر تحميل الملف الطبي");
+        setLoading(false);
+        return;
+      }
+
+      setPatient((patientData ?? null) as PatientRow | null);
+      setInvoices((invoiceData ?? []) as InvoiceRow[]);
+      setLoading(false);
+    }
+
+    loadPatient();
+  }, [patientId]);
 
   return (
     <AppShell>
       <div className="space-y-6">
-        <Link
-          to="/patients"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
+        <Link to="/patients" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowRight className="h-4 w-4" /> العودة إلى المرضى
         </Link>
 
-        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)] md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[image:var(--gradient-primary)] text-2xl font-bold text-primary-foreground">
-              {patient.name.charAt(0)}
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{patient.name}</h1>
-              <p className="text-sm text-muted-foreground">
-                {patient.id} · {patient.age} سنة · {patient.gender} · {patient.phone}
-              </p>
-            </div>
-          </div>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-[image:var(--gradient-action)] px-5 py-3 text-sm font-semibold text-action-foreground shadow-md hover:brightness-105">
-            <Plus className="h-4 w-4" /> إضافة سجل
-          </button>
-        </div>
+        {loading ? (
+          <Card className="rounded-lg p-10 text-center shadow-[var(--shadow-card)]">
+            <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">جاري تحميل الملف الطبي…</p>
+          </Card>
+        ) : !patient ? (
+          <Card className="rounded-lg p-10 text-center shadow-[var(--shadow-card)]">
+            <h1 className="text-xl font-semibold">المريض غير موجود</h1>
+            <Button asChild className="mt-4">
+              <Link to="/patients">العودة إلى قائمة المرضى</Link>
+            </Button>
+          </Card>
+        ) : (
+          <>
+            <section className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 shadow-[var(--shadow-card)] md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-2xl font-bold text-primary-foreground">
+                  {patient.full_name.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-action">ملف طبي</p>
+                  <h1 className="text-2xl font-semibold tracking-tight">{patient.full_name}</h1>
+                  <p className="text-sm text-muted-foreground">
+                    {patient.patient_number} · {patient.age ?? "—"} سنة · {patient.gender} · {patient.phone || "بدون هاتف"}
+                  </p>
+                </div>
+              </div>
+              <span className="w-fit rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">{patient.status}</span>
+            </section>
 
-        <div className="rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
-          <div className="flex items-center gap-2 border-b border-border px-6 py-4">
-            <FileText className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">السجل الطبي وخطط العلاج</h2>
-          </div>
-          {records.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-muted-foreground">
-              لا توجد سجلات طبية لهذا المريض حتى الآن.
-            </p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {records.map((r: MedicalRecord) => (
-                <li key={r.id} className="grid gap-2 px-6 py-5 md:grid-cols-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">التاريخ</p>
-                    <p className="text-sm font-medium">{r.date}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">التشخيص</p>
-                    <p className="text-sm font-medium">{r.diagnosis}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">العلاج</p>
-                    <p className="text-sm">{r.treatment}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">الطبيب</p>
-                    <p className="text-sm">{r.doctor}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+            <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+              <Card className="rounded-lg shadow-[var(--shadow-card)]">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <UserRound className="h-5 w-5 text-primary" /> معلومات المريض
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-2">
+                  <InfoItem label="العمر" value={patient.age ? `${patient.age} سنة` : "—"} />
+                  <InfoItem label="النوع" value={patient.gender} />
+                  <InfoItem label="الهاتف" value={patient.phone || "—"} />
+                  <InfoItem label="آخر زيارة" value={patient.last_visit} />
+                  <InfoItem label="العنوان" value={patient.address || "—"} className="sm:col-span-2" />
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-lg shadow-[var(--shadow-card)]">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <HeartPulse className="h-5 w-5 text-action" /> الأمراض المزمنة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="min-h-24 rounded-lg border border-border bg-secondary/40 p-4 text-sm leading-7">
+                    {patient.chronic_diseases || "لا توجد أمراض مزمنة مسجلة."}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="rounded-lg shadow-[var(--shadow-card)]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <FileText className="h-5 w-5 text-primary" /> ملاحظات الملف الطبي
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="rounded-lg border border-border bg-background p-4 text-sm leading-7 text-muted-foreground">
+                  {patient.notes || "لا توجد ملاحظات إضافية."}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-lg shadow-[var(--shadow-card)]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <CreditCard className="h-5 w-5 text-action" /> فواتير المريض
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-right text-xs font-semibold text-muted-foreground">
+                      <th className="px-3 py-2">رقم الفاتورة</th>
+                      <th className="px-3 py-2">الوصف</th>
+                      <th className="px-3 py-2">المبلغ</th>
+                      <th className="px-3 py-2">الحالة</th>
+                      <th className="px-3 py-2">طريقة الدفع</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoices.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">لا توجد فواتير لهذا المريض.</td>
+                      </tr>
+                    ) : (
+                      invoices.map((invoice) => (
+                        <tr key={invoice.id} className="border-b border-border/70">
+                          <td className="px-3 py-3 font-medium">{invoice.invoice_number}</td>
+                          <td className="px-3 py-3">{invoice.description}</td>
+                          <td className="px-3 py-3">${Number(invoice.amount).toFixed(2)}</td>
+                          <td className="px-3 py-3">{paymentStatusLabel(invoice.payment_status)}</td>
+                          <td className="px-3 py-3">{paymentMethodLabel(invoice.payment_method)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </AppShell>
+  );
+}
+
+function InfoItem({ label, value, className = "" }: { label: string; value: string; className?: string }) {
+  return (
+    <div className={`rounded-lg border border-border bg-secondary/30 p-4 ${className}`}>
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-2 font-medium text-foreground">{value}</p>
+    </div>
   );
 }
