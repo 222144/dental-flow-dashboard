@@ -61,15 +61,22 @@ function PatientDetail() {
   useEffect(() => {
     async function loadPatient() {
       setLoading(true);
-      const [{ data: patientData, error: patientError }, { data: invoiceData, error: invoiceError }] = await Promise.all([
+      const [
+        { data: patientData, error: patientError },
+        { data: invoiceData, error: invoiceError },
+      ] = await Promise.all([
         (supabase as any)
           .from("patients")
-          .select("id, patient_number, full_name, age, gender, phone, address, chronic_diseases, notes, status, last_visit")
+          .select(
+            "id, patient_number, full_name, age, gender, phone, address, chronic_diseases, notes, status, last_visit",
+          )
           .eq("id", patientId)
           .maybeSingle(),
         (supabase as any)
           .from("patient_invoices")
-          .select("id, invoice_number, description, amount, currency, payment_status, payment_method, paid_at, due_date")
+          .select(
+            "id, invoice_number, description, amount, currency, payment_status, payment_method, paid_at, due_date",
+          )
           .eq("patient_id", patientId)
           .order("created_at", { ascending: false }),
       ]);
@@ -91,7 +98,10 @@ function PatientDetail() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <Link to="/patients" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/patients"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowRight className="h-4 w-4" /> العودة إلى المرضى
         </Link>
 
@@ -118,11 +128,14 @@ function PatientDetail() {
                   <p className="text-xs font-semibold text-action">ملف طبي</p>
                   <h1 className="text-2xl font-semibold tracking-tight">{patient.full_name}</h1>
                   <p className="text-sm text-muted-foreground">
-                    {patient.patient_number} · {patient.age ?? "—"} سنة · {patient.gender} · {patient.phone || "بدون هاتف"}
+                    {patient.patient_number} · {patient.age ?? "—"} سنة · {patient.gender} ·{" "}
+                    {patient.phone || "بدون هاتف"}
                   </p>
                 </div>
               </div>
-              <span className="w-fit rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">{patient.status}</span>
+              <span className="w-fit rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
+                {patient.status}
+              </span>
             </section>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
@@ -137,7 +150,11 @@ function PatientDetail() {
                   <InfoItem label="النوع" value={patient.gender} />
                   <InfoItem label="الهاتف" value={patient.phone || "—"} />
                   <InfoItem label="آخر زيارة" value={patient.last_visit} />
-                  <InfoItem label="العنوان" value={patient.address || "—"} className="sm:col-span-2" />
+                  <InfoItem
+                    label="العنوان"
+                    value={patient.address || "—"}
+                    className="sm:col-span-2"
+                  />
                 </CardContent>
               </Card>
 
@@ -188,7 +205,9 @@ function PatientDetail() {
                   <tbody>
                     {invoices.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">لا توجد فواتير لهذا المريض.</td>
+                        <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                          لا توجد فواتير لهذا المريض.
+                        </td>
                       </tr>
                     ) : (
                       invoices.map((invoice) => (
@@ -196,8 +215,12 @@ function PatientDetail() {
                           <td className="px-3 py-3 font-medium">{invoice.invoice_number}</td>
                           <td className="px-3 py-3">{invoice.description}</td>
                           <td className="px-3 py-3">${Number(invoice.amount).toFixed(2)}</td>
-                          <td className="px-3 py-3">{paymentStatusLabel(invoice.payment_status)}</td>
-                          <td className="px-3 py-3">{paymentMethodLabel(invoice.payment_method)}</td>
+                          <td className="px-3 py-3">
+                            {paymentStatusLabel(invoice.payment_status)}
+                          </td>
+                          <td className="px-3 py-3">
+                            {paymentMethodLabel(invoice.payment_method)}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -212,7 +235,15 @@ function PatientDetail() {
   );
 }
 
-function InfoItem({ label, value, className = "" }: { label: string; value: string; className?: string }) {
+function InfoItem({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
     <div className={`rounded-lg border border-border bg-secondary/30 p-4 ${className}`}>
       <p className="text-xs font-semibold text-muted-foreground">{label}</p>

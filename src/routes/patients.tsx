@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CreditCard, DollarSign, Eye, FilePlus2, Loader2, Plus, Search, WalletCards } from "lucide-react";
+import {
+  CreditCard,
+  DollarSign,
+  Eye,
+  FilePlus2,
+  Loader2,
+  Plus,
+  Search,
+  WalletCards,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -16,7 +25,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -133,14 +148,21 @@ function PatientsPage() {
 
     setUserId(currentUserId);
 
-    const [{ data: patientsData, error: patientsError }, { data: invoicesData, error: invoicesError }] = await Promise.all([
+    const [
+      { data: patientsData, error: patientsError },
+      { data: invoicesData, error: invoicesError },
+    ] = await Promise.all([
       (supabase as any)
         .from("patients")
-        .select("id, patient_number, full_name, age, gender, phone, chronic_diseases, notes, status, last_visit")
+        .select(
+          "id, patient_number, full_name, age, gender, phone, chronic_diseases, notes, status, last_visit",
+        )
         .order("created_at", { ascending: false }),
       (supabase as any)
         .from("patient_invoices")
-        .select("id, patient_id, invoice_number, amount, currency, payment_status, payment_method, paid_at, due_date")
+        .select(
+          "id, patient_id, invoice_number, amount, currency, payment_status, payment_method, paid_at, due_date",
+        )
         .order("created_at", { ascending: false }),
     ]);
 
@@ -170,7 +192,12 @@ function PatientsPage() {
       return;
     }
 
-    if (fullName.length > 120 || phone.length > 40 || form.notes.length > 1000 || form.chronicDiseases.length > 1000) {
+    if (
+      fullName.length > 120 ||
+      phone.length > 40 ||
+      form.notes.length > 1000 ||
+      form.chronicDiseases.length > 1000
+    ) {
       toast.error("بعض البيانات أطول من المسموح");
       return;
     }
@@ -245,7 +272,10 @@ function PatientsPage() {
               أضف المريض، افتح ملفه الطبي، وسجل فاتورة فتح الملف بقيمة 10 دولار.
             </p>
           </div>
-          <Button onClick={() => setOpen(true)} className="h-11 bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105">
+          <Button
+            onClick={() => setOpen(true)}
+            className="h-11 bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
+          >
             <Plus className="h-4 w-4" /> إضافة مريض
           </Button>
         </section>
@@ -253,7 +283,9 @@ function PatientsPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="rounded-lg shadow-[var(--shadow-card)]">
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">إجمالي المرضى</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                إجمالي المرضى
+              </CardTitle>
               <FilePlus2 className="h-5 w-5 text-primary" />
             </CardHeader>
             <CardContent>
@@ -262,7 +294,9 @@ function PatientsPage() {
           </Card>
           <Card className="rounded-lg shadow-[var(--shadow-card)]">
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">مدفوع أولًا</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                مدفوع أولًا
+              </CardTitle>
               <DollarSign className="h-5 w-5 text-success" />
             </CardHeader>
             <CardContent>
@@ -271,7 +305,9 @@ function PatientsPage() {
           </Card>
           <Card className="rounded-lg shadow-[var(--shadow-card)]">
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">فواتير لاحقة</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                فواتير لاحقة
+              </CardTitle>
               <WalletCards className="h-5 w-5 text-action" />
             </CardHeader>
             <CardContent>
@@ -283,7 +319,10 @@ function PatientsPage() {
         {!userId && !loading ? (
           <Card className="rounded-lg p-8 text-center shadow-[var(--shadow-card)]">
             <p className="font-semibold">يجب تسجيل الدخول لإدارة المرضى.</p>
-            <Link to="/login" className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline">
+            <Link
+              to="/login"
+              className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline"
+            >
               الذهاب لتسجيل الدخول
             </Link>
           </Card>
@@ -331,19 +370,30 @@ function PatientsPage() {
                     filteredPatients.map((patient) => {
                       const invoice = invoiceByPatient.get(patient.id);
                       return (
-                        <tr key={patient.id} className="border-t border-border transition hover:bg-accent/30">
-                          <td className="px-5 py-4 font-semibold text-primary">{patient.full_name}</td>
+                        <tr
+                          key={patient.id}
+                          className="border-t border-border transition hover:bg-accent/30"
+                        >
+                          <td className="px-5 py-4 font-semibold text-primary">
+                            {patient.full_name}
+                          </td>
                           <td className="px-5 py-4">{patient.patient_number}</td>
                           <td className="px-5 py-4">{patient.phone || "—"}</td>
                           <td className="max-w-[240px] px-5 py-4 text-muted-foreground">
-                            <span className="line-clamp-2">{patient.chronic_diseases || "لا يوجد"}</span>
+                            <span className="line-clamp-2">
+                              {patient.chronic_diseases || "لا يوجد"}
+                            </span>
                           </td>
                           <td className="px-5 py-4">
-                            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${invoice?.payment_status === "paid" ? "bg-success/15 text-success" : "bg-action/15 text-action"}`}>
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${invoice?.payment_status === "paid" ? "bg-success/15 text-success" : "bg-action/15 text-action"}`}
+                            >
                               {invoice ? paymentStatusLabel(invoice.payment_status) : "—"}
                             </span>
                           </td>
-                          <td className="px-5 py-4">{invoice ? paymentMethodLabel(invoice.payment_method) : "—"}</td>
+                          <td className="px-5 py-4">
+                            {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
+                          </td>
                           <td className="px-5 py-4 text-left">
                             <Button asChild variant="secondary" size="sm">
                               <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
@@ -381,13 +431,18 @@ function PatientsPage() {
               <tbody>
                 {invoices.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">لا توجد فواتير بعد.</td>
+                    <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                      لا توجد فواتير بعد.
+                    </td>
                   </tr>
                 ) : (
                   invoices.map((invoice) => (
                     <tr key={invoice.id} className="border-b border-border/70">
                       <td className="px-3 py-3 font-medium">{invoice.invoice_number}</td>
-                      <td className="px-3 py-3">{patients.find((patient) => patient.id === invoice.patient_id)?.full_name ?? "—"}</td>
+                      <td className="px-3 py-3">
+                        {patients.find((patient) => patient.id === invoice.patient_id)?.full_name ??
+                          "—"}
+                      </td>
                       <td className="px-3 py-3">${Number(invoice.amount).toFixed(2)}</td>
                       <td className="px-3 py-3">{paymentStatusLabel(invoice.payment_status)}</td>
                       <td className="px-3 py-3">{paymentMethodLabel(invoice.payment_method)}</td>
@@ -404,26 +459,50 @@ function PatientsPage() {
         <DialogContent className="max-h-[92vh] overflow-y-auto text-right sm:max-w-3xl" dir="rtl">
           <DialogHeader className="text-right">
             <DialogTitle>إضافة مريض جديد</DialogTitle>
-            <DialogDescription>سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار.</DialogDescription>
+            <DialogDescription>
+              سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="full-name">اسم المريض</Label>
-              <Input id="full-name" value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} maxLength={120} />
+              <Input
+                id="full-name"
+                value={form.fullName}
+                onChange={(event) => setForm({ ...form, fullName: event.target.value })}
+                maxLength={120}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">الهاتف</Label>
-              <Input id="phone" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} maxLength={40} />
+              <Input
+                id="phone"
+                value={form.phone}
+                onChange={(event) => setForm({ ...form, phone: event.target.value })}
+                maxLength={40}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="age">العمر</Label>
-              <Input id="age" type="number" min={0} max={130} value={form.age} onChange={(event) => setForm({ ...form, age: event.target.value })} />
+              <Input
+                id="age"
+                type="number"
+                min={0}
+                max={130}
+                value={form.age}
+                onChange={(event) => setForm({ ...form, age: event.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label>النوع</Label>
-              <Select value={form.gender} onValueChange={(value) => setForm({ ...form, gender: value })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.gender}
+                onValueChange={(value) => setForm({ ...form, gender: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ذكر">ذكر</SelectItem>
                   <SelectItem value="أنثى">أنثى</SelectItem>
@@ -432,15 +511,31 @@ function PatientsPage() {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="address">العنوان</Label>
-              <Input id="address" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} maxLength={180} />
+              <Input
+                id="address"
+                value={form.address}
+                onChange={(event) => setForm({ ...form, address: event.target.value })}
+                maxLength={180}
+              />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="diseases">الأمراض المزمنة</Label>
-              <Textarea id="diseases" value={form.chronicDiseases} onChange={(event) => setForm({ ...form, chronicDiseases: event.target.value })} placeholder="مثال: سكري، ضغط، حساسية من البنسلين…" maxLength={1000} />
+              <Textarea
+                id="diseases"
+                value={form.chronicDiseases}
+                onChange={(event) => setForm({ ...form, chronicDiseases: event.target.value })}
+                placeholder="مثال: سكري، ضغط، حساسية من البنسلين…"
+                maxLength={1000}
+              />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="notes">ملاحظات</Label>
-              <Textarea id="notes" value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} maxLength={1000} />
+              <Textarea
+                id="notes"
+                value={form.notes}
+                onChange={(event) => setForm({ ...form, notes: event.target.value })}
+                maxLength={1000}
+              />
             </div>
           </div>
 
@@ -449,8 +544,13 @@ function PatientsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>هل سيدفع الآن؟</Label>
-                <Select value={form.payNow} onValueChange={(value: "paid" | "pending") => setForm({ ...form, payNow: value })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.payNow}
+                  onValueChange={(value: "paid" | "pending") => setForm({ ...form, payNow: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="paid">يدفع الآن</SelectItem>
                     <SelectItem value="pending">في وقت لاحق</SelectItem>
@@ -459,8 +559,15 @@ function PatientsPage() {
               </div>
               <div className="space-y-2">
                 <Label>طريقة الدفع</Label>
-                <Select value={form.paymentMethod} onValueChange={(value: "cash" | "card") => setForm({ ...form, paymentMethod: value })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.paymentMethod}
+                  onValueChange={(value: "cash" | "card") =>
+                    setForm({ ...form, paymentMethod: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
                     <SelectItem value="card">بطاقة</SelectItem>
@@ -471,8 +578,14 @@ function PatientsPage() {
           </div>
 
           <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>إلغاء</Button>
-            <Button onClick={handleAddPatient} disabled={saving} className="bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105">
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleAddPatient}
+              disabled={saving}
+              className="bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
+            >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />} تمت الإضافة
             </Button>
           </DialogFooter>
