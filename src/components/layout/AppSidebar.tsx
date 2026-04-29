@@ -39,8 +39,8 @@ export function AppSidebar({ open, onClose }: { open: boolean; onClose: () => vo
       >
         <div className="flex h-16 items-center justify-between gap-3 border-b border-sidebar-border px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[image:var(--gradient-primary)] shadow-md">
-              <Activity className="h-5 w-5 text-primary-foreground" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-action shadow-md">
+              <Activity className="h-5 w-5 text-action-foreground" />
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight">عيادة الأسنان</p>
