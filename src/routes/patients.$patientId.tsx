@@ -70,7 +70,7 @@ function PatientDetail() {
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {records.map((r) => (
+              {records.map((r: MedicalRecord) => (
                 <li key={r.id} className="grid gap-2 px-6 py-5 md:grid-cols-4">
                   <div>
                     <p className="text-xs font-semibold uppercase text-muted-foreground">التاريخ</p>
