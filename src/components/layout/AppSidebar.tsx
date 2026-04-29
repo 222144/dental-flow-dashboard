@@ -6,7 +6,6 @@ import {
   ScanLine,
   LayoutDashboard,
   Activity,
-  UserCircle,
   X,
 } from "lucide-react";
 
@@ -26,10 +25,6 @@ const navGroups = [
   {
     label: "التشخيص الذكي",
     items: [{ to: "/xray", label: "تحليل الأشعة", icon: ScanLine }],
-  },
-  {
-    label: "الحساب",
-    items: [{ to: "/profile", label: "الملف الشخصي", icon: UserCircle }],
   },
 ] as const;
 
