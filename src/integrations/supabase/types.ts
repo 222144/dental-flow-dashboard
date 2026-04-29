@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      patient_invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          description: string
+          due_date: string
+          id: string
+          invoice_number: string
+          notes: string
+          paid_at: string | null
+          patient_id: string
+          payment_method: string
+          payment_status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          due_date?: string
+          id?: string
+          invoice_number: string
+          notes?: string
+          paid_at?: string | null
+          patient_id: string
+          payment_method?: string
+          payment_status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          notes?: string
+          paid_at?: string | null
+          patient_id?: string
+          payment_method?: string
+          payment_status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_invoices_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          address: string
+          age: number | null
+          chronic_diseases: string
+          created_at: string
+          full_name: string
+          gender: string
+          id: string
+          last_visit: string
+          notes: string
+          patient_number: string
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string
+          age?: number | null
+          chronic_diseases?: string
+          created_at?: string
+          full_name: string
+          gender?: string
+          id?: string
+          last_visit?: string
+          notes?: string
+          patient_number: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          age?: number | null
+          chronic_diseases?: string
+          created_at?: string
+          full_name?: string
+          gender?: string
+          id?: string
+          last_visit?: string
+          notes?: string
+          patient_number?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
