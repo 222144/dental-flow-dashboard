@@ -77,14 +77,14 @@ function PatientDetail() {
         { data: patientData, error: patientError },
         { data: invoiceData, error: invoiceError },
       ] = await Promise.all([
-        (supabase as any)
+        db
           .from("patients")
           .select(
             "id, patient_number, full_name, age, gender, phone, address, chronic_diseases, notes, status, last_visit",
           )
           .eq("id", patientId)
           .maybeSingle(),
-        (supabase as any)
+        db
           .from("patient_invoices")
           .select(
             "id, invoice_number, description, amount, currency, payment_status, payment_method, paid_at, due_date",
