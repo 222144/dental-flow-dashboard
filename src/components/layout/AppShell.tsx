@@ -1,4 +1,5 @@
 import { ReactNode, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { AppSidebar } from "./AppSidebar";
 import { Bell, Menu, Search } from "lucide-react";
 
@@ -20,10 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <div className="hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 lg:flex">
               <Search className="h-4 w-4 text-muted-foreground" />
-              <input
-                placeholder="بحث سريع…"
-                className="w-64 bg-transparent text-sm outline-none"
-              />
+              <input placeholder="بحث سريع…" className="w-64 bg-transparent text-sm outline-none" />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -31,12 +29,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Bell className="h-5 w-5" />
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-action" />
             </button>
-            <div className="h-9 w-9 rounded-full bg-[image:var(--gradient-primary)]" />
+            <Link
+              to="/profile"
+              className="h-9 w-9 rounded-full bg-[image:var(--gradient-primary)] ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2"
+              aria-label="الملف الشخصي"
+            />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
+        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

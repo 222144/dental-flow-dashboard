@@ -1,13 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
-import { patients, medicalRecords } from "@/data/mock";
+import { patients, medicalRecords, type MedicalRecord } from "@/data/mock";
 import { ArrowRight, FileText, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/patients/$patientId")({
   loader: ({ params }) => {
     const patient = patients.find((p) => p.id === params.patientId);
     if (!patient) throw notFound();
-    return { patient, records: medicalRecords[patient.id] ?? [] };
+    const records: MedicalRecord[] = medicalRecords[patient.id] ?? [];
+    return { patient, records };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -69,7 +70,7 @@ function PatientDetail() {
             </p>
           ) : (
             <ul className="divide-y divide-border">
-              {records.map((r) => (
+              {records.map((r: MedicalRecord) => (
                 <li key={r.id} className="grid gap-2 px-6 py-5 md:grid-cols-4">
                   <div>
                     <p className="text-xs font-semibold uppercase text-muted-foreground">التاريخ</p>

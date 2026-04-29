@@ -6,6 +6,7 @@ import {
   ScanLine,
   LayoutDashboard,
   Activity,
+  UserCircle,
   X,
 } from "lucide-react";
 
@@ -26,15 +27,13 @@ const navGroups = [
     label: "التشخيص الذكي",
     items: [{ to: "/xray", label: "تحليل الأشعة", icon: ScanLine }],
   },
+  {
+    label: "الحساب",
+    items: [{ to: "/profile", label: "الملف الشخصي", icon: UserCircle }],
+  },
 ] as const;
 
-export function AppSidebar({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function AppSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { pathname } = useLocation();
 
   return (
@@ -78,10 +77,7 @@ export function AppSidebar({
               </p>
               <ul className="space-y-1">
                 {group.items.map((item) => {
-                  const active =
-                    item.to === "/"
-                      ? pathname === "/"
-                      : pathname.startsWith(item.to);
+                  const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
                   const Icon = item.icon;
                   return (
                     <li key={item.to}>
