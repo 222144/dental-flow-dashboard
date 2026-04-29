@@ -164,13 +164,13 @@ function PatientsPage() {
       { data: patientsData, error: patientsError },
       { data: invoicesData, error: invoicesError },
     ] = await Promise.all([
-      (supabase as any)
+      db
         .from("patients")
         .select(
           "id, patient_number, full_name, age, gender, phone, chronic_diseases, notes, status, last_visit",
         )
         .order("created_at", { ascending: false }),
-      (supabase as any)
+      db
         .from("patient_invoices")
         .select(
           "id, patient_id, invoice_number, amount, currency, payment_status, payment_method, paid_at, due_date",
@@ -224,7 +224,7 @@ function PatientsPage() {
     const patientNumber = `P-${Date.now().toString().slice(-6)}`;
     const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 
-    const { data: patient, error: patientError } = await (supabase as any)
+    const { data: patient, error: patientError } = await db
       .from("patients")
       .insert({
         user_id: userId,
@@ -248,7 +248,7 @@ function PatientsPage() {
       return;
     }
 
-    const { error: invoiceError } = await (supabase as any).from("patient_invoices").insert({
+    const { error: invoiceError } = await db.from("patient_invoices").insert({
       user_id: userId,
       patient_id: patient.id,
       invoice_number: invoiceNumber,
