@@ -1,13 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import {
-  Users,
-  UserCog,
-  Stethoscope,
-  ScanLine,
-  LayoutDashboard,
-  Activity,
-  X,
-} from "lucide-react";
+import { Users, UserCog, Stethoscope, ScanLine, LayoutDashboard, Activity, X } from "lucide-react";
 
 const navGroups = [
   {
