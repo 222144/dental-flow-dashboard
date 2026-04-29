@@ -31,9 +31,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <Link
               to="/profile"
-              className="h-9 w-9 rounded-full bg-[image:var(--gradient-primary)] ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[image:var(--gradient-primary)] text-xs font-bold text-primary-foreground ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2"
               aria-label="الملف الشخصي"
-            />
+            >
+              AD
+            </Link>
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">{children}</main>
