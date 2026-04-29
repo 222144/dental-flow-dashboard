@@ -239,7 +239,7 @@ function PatientsPage() {
         status: "نشط",
         last_visit: new Date().toISOString().slice(0, 10),
       })
-      .select("id")
+      .select<{ id: string }>("id")
       .single();
 
     if (patientError || !patient) {
