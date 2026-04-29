@@ -153,7 +153,9 @@ function ProfilePage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">الملف الشخصي</h1>
-              <p className="text-sm text-muted-foreground">إدارة اسم المستخدم وبيانات الدخول الخاصة بك</p>
+              <p className="text-sm text-muted-foreground">
+                إدارة اسم المستخدم وبيانات الدخول الخاصة بك
+              </p>
             </div>
           </div>
           <div className="inline-flex w-fit items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground">
@@ -166,7 +168,9 @@ function ProfilePage() {
           <Card className="rounded-lg">
             <CardContent className="p-8 text-center">
               <p className="font-semibold">يجب تسجيل الدخول لعرض الملف الشخصي.</p>
-              <p className="mt-2 text-sm text-muted-foreground">انتقل إلى صفحة تسجيل الدخول ثم عُد إلى هذه الصفحة.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                انتقل إلى صفحة تسجيل الدخول ثم عُد إلى هذه الصفحة.
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -193,7 +197,11 @@ function ProfilePage() {
                   />
                 </div>
 
-                <Button onClick={handleSaveProfile} disabled={loading || savingProfile} className="h-11 w-full">
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={loading || savingProfile}
+                  className="h-11 w-full"
+                >
                   <Save className="h-4 w-4" />
                   حفظ اسم المستخدم
                 </Button>
@@ -257,7 +265,11 @@ function ProfilePage() {
                   <p>عند تغيير البريد الإلكتروني قد تحتاج إلى تأكيده من رسالة التحقق.</p>
                 </div>
 
-                <Button onClick={handleSaveSecurity} disabled={loading || savingSecurity} className="h-11 w-full">
+                <Button
+                  onClick={handleSaveSecurity}
+                  disabled={loading || savingSecurity}
+                  className="h-11 w-full"
+                >
                   <KeyRound className="h-4 w-4" />
                   تحديث بيانات الدخول
                 </Button>

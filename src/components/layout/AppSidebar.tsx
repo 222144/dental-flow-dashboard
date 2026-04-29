@@ -33,13 +33,7 @@ const navGroups = [
   },
 ] as const;
 
-export function AppSidebar({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function AppSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { pathname } = useLocation();
 
   return (
@@ -83,10 +77,7 @@ export function AppSidebar({
               </p>
               <ul className="space-y-1">
                 {group.items.map((item) => {
-                  const active =
-                    item.to === "/"
-                      ? pathname === "/"
-                      : pathname.startsWith(item.to);
+                  const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
                   const Icon = item.icon;
                   return (
                     <li key={item.to}>

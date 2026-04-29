@@ -21,10 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <div className="hidden items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 lg:flex">
               <Search className="h-4 w-4 text-muted-foreground" />
-              <input
-                placeholder="بحث سريع…"
-                className="w-64 bg-transparent text-sm outline-none"
-              />
+              <input placeholder="بحث سريع…" className="w-64 bg-transparent text-sm outline-none" />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -39,9 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
+        <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
