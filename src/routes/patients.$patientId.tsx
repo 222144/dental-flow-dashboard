@@ -8,6 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
+type DbError = { message: string };
+type QueryResult<T> = PromiseLike<{ data: T | null; error: DbError | null }>;
+type DbQuery<T = unknown> = QueryResult<T> & {
+  select: <TResult = unknown>(columns?: string) => DbQuery<TResult>;
+  eq: (column: string, value: string) => DbQuery<T>;
+  order: (column: string, options?: { ascending: boolean }) => DbQuery<T>;
+  maybeSingle: () => DbQuery<T extends Array<infer Row> ? Row : T>;
+};
+type DbClient = { from: (table: string) => DbQuery };
+
+const db = supabase as unknown as DbClient;
+
 export const Route = createFileRoute("/patients/$patientId")({
   head: () => ({
     meta: [
