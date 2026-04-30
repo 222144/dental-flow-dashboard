@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, CreditCard, FileText, HeartPulse, Loader2, UserRound } from "lucide-react";
+import { ArrowRight, CreditCard, FileText, HeartPulse, Loader2, Stethoscope, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
