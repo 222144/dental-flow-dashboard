@@ -429,11 +429,20 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <Button asChild variant="secondary" size="sm">
-                              <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
-                                <Eye className="h-4 w-4" /> عرض الملف
-                              </Link>
-                            </Button>
+                            <div className="inline-flex items-center gap-2">
+                              <Button asChild variant="secondary" size="sm">
+                                <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
+                                  <Eye className="h-4 w-4" /> عرض
+                                </Link>
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeletePatient(patient.id, patient.full_name)}
+                              >
+                                <Trash2 className="h-4 w-4" /> حذف
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
