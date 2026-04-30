@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, CreditCard, FileText, HeartPulse, Loader2, UserRound } from "lucide-react";
+import { ArrowRight, CreditCard, FileText, HeartPulse, Loader2, Stethoscope, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -69,6 +69,7 @@ function PatientDetail() {
   const [patient, setPatient] = useState<PatientRow | null>(null);
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMedicalFile, setShowMedicalFile] = useState(false);
 
   useEffect(() => {
     async function loadPatient() {
@@ -150,52 +151,67 @@ function PatientDetail() {
               </span>
             </section>
 
-            <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-              <Card className="rounded-lg shadow-[var(--shadow-card)]">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <UserRound className="h-5 w-5 text-primary" /> معلومات المريض
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-4 sm:grid-cols-2">
-                  <InfoItem label="العمر" value={patient.age ? `${patient.age} سنة` : "—"} />
-                  <InfoItem label="النوع" value={patient.gender} />
-                  <InfoItem label="الهاتف" value={patient.phone || "—"} />
-                  <InfoItem label="آخر زيارة" value={patient.last_visit} />
-                  <InfoItem
-                    label="العنوان"
-                    value={patient.address || "—"}
-                    className="sm:col-span-2"
-                  />
-                </CardContent>
-              </Card>
+            <Button
+              size="lg"
+              onClick={() => setShowMedicalFile((v) => !v)}
+              className="h-16 w-full bg-[image:var(--gradient-action)] text-lg font-bold text-action-foreground shadow-lg hover:brightness-105"
+            >
+              <Stethoscope className="h-6 w-6" />
+              {showMedicalFile ? "إخفاء الملف الطبي" : "عرض الملف الطبي للمريض"}
+            </Button>
 
-              <Card className="rounded-lg shadow-[var(--shadow-card)]">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <HeartPulse className="h-5 w-5 text-action" /> الأمراض المزمنة
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="min-h-24 rounded-lg border border-border bg-secondary/40 p-4 text-sm leading-7">
-                    {patient.chronic_diseases || "لا توجد أمراض مزمنة مسجلة."}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            {showMedicalFile && (
+              <>
+                <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+                  <Card className="rounded-lg shadow-[var(--shadow-card)]">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <UserRound className="h-5 w-5 text-primary" /> معلومات المريض
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 sm:grid-cols-2">
+                      <InfoItem label="الاسم الكامل" value={patient.full_name} />
+                      <InfoItem label="رقم الملف" value={patient.patient_number} />
+                      <InfoItem label="العمر" value={patient.age ? `${patient.age} سنة` : "—"} />
+                      <InfoItem label="النوع" value={patient.gender} />
+                      <InfoItem label="الهاتف" value={patient.phone || "—"} />
+                      <InfoItem label="آخر زيارة" value={patient.last_visit} />
+                      <InfoItem
+                        label="العنوان"
+                        value={patient.address || "—"}
+                        className="sm:col-span-2"
+                      />
+                    </CardContent>
+                  </Card>
 
-            <Card className="rounded-lg shadow-[var(--shadow-card)]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <FileText className="h-5 w-5 text-primary" /> ملاحظات الملف الطبي
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="rounded-lg border border-border bg-background p-4 text-sm leading-7 text-muted-foreground">
-                  {patient.notes || "لا توجد ملاحظات إضافية."}
-                </p>
-              </CardContent>
-            </Card>
+                  <Card className="rounded-lg shadow-[var(--shadow-card)]">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <HeartPulse className="h-5 w-5 text-action" /> الأمراض المزمنة
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="min-h-24 rounded-lg border border-border bg-secondary/40 p-4 text-sm leading-7">
+                        {patient.chronic_diseases || "لا توجد أمراض مزمنة مسجلة."}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="rounded-lg shadow-[var(--shadow-card)]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <FileText className="h-5 w-5 text-primary" /> ملاحظات الملف الطبي
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="rounded-lg border border-border bg-background p-4 text-sm leading-7 text-muted-foreground">
+                      {patient.notes || "لا توجد ملاحظات إضافية."}
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             <Card className="rounded-lg shadow-[var(--shadow-card)]">
               <CardHeader>

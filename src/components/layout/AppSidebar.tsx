@@ -1,22 +1,13 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Users, UserCog, Stethoscope, ScanLine, LayoutDashboard, Activity, X } from "lucide-react";
+import { Users, CreditCard, Activity, X } from "lucide-react";
 
 const navGroups = [
   {
-    label: "نظرة عامة",
-    items: [{ to: "/", label: "لوحة التحكم", icon: LayoutDashboard }],
-  },
-  {
-    label: "إدارة الموظفين",
+    label: "الإدارة",
     items: [
       { to: "/patients", label: "إدارة المرضى", icon: Users },
-      { to: "/users", label: "إدارة المستخدمين", icon: UserCog },
-      { to: "/doctors", label: "إدارة الأطباء", icon: Stethoscope },
+      { to: "/invoices", label: "إدارة الفواتير", icon: CreditCard },
     ],
-  },
-  {
-    label: "التشخيص الذكي",
-    items: [{ to: "/xray", label: "تحليل الأشعة", icon: ScanLine }],
   },
 ] as const;
 
@@ -64,7 +55,7 @@ export function AppSidebar({ open, onClose }: { open: boolean; onClose: () => vo
               </p>
               <ul className="space-y-1">
                 {group.items.map((item) => {
-                  const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                  const active = pathname.startsWith(item.to);
                   const Icon = item.icon;
                   return (
                     <li key={item.to}>
