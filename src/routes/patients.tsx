@@ -8,6 +8,7 @@ import {
   Loader2,
   Plus,
   Search,
+  Trash2,
   WalletCards,
 } from "lucide-react";
 import { toast } from "sonner";
