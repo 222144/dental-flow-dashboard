@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Users, UserCog, Stethoscope, ScanLine, LayoutDashboard, Activity, X } from "lucide-react";
+import { Users, UserCog, Stethoscope, ScanLine, LayoutDashboard, Activity, Receipt, X } from "lucide-react";
 
 const navGroups = [
   {
@@ -13,6 +13,10 @@ const navGroups = [
       { to: "/users", label: "إدارة المستخدمين", icon: UserCog },
       { to: "/doctors", label: "إدارة الأطباء", icon: Stethoscope },
     ],
+  },
+  {
+    label: "المالية",
+    items: [{ to: "/invoices", label: "إدارة الفواتير", icon: Receipt }],
   },
   {
     label: "التشخيص الذكي",
