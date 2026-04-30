@@ -55,7 +55,7 @@ export function AppSidebar({ open, onClose }: { open: boolean; onClose: () => vo
               </p>
               <ul className="space-y-1">
                 {group.items.map((item) => {
-                  const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                  const active = pathname.startsWith(item.to);
                   const Icon = item.icon;
                   return (
                     <li key={item.to}>
