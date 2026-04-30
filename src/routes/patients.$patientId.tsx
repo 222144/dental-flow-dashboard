@@ -69,6 +69,7 @@ function PatientDetail() {
   const [patient, setPatient] = useState<PatientRow | null>(null);
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMedicalFile, setShowMedicalFile] = useState(false);
 
   useEffect(() => {
     async function loadPatient() {
