@@ -31,10 +31,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
             <Link
               to="/profile"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[image:var(--gradient-primary)] text-xs font-bold text-primary-foreground ring-offset-background transition-shadow hover:ring-2 hover:ring-ring hover:ring-offset-2"
+              className="flex items-center gap-3 rounded-full p-1 pl-3 transition-colors hover:bg-muted"
               aria-label="الملف الشخصي"
             >
-              AD
+              <div className="text-right leading-tight">
+                <p className="text-sm font-semibold text-foreground">Dr. Rana Salem</p>
+                <p className="text-xs text-muted-foreground">Administrator</p>
+              </div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[image:var(--gradient-primary)] text-xs font-bold text-primary-foreground">
+                DR
+              </div>
             </Link>
           </div>
         </header>
