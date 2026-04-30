@@ -384,7 +384,7 @@ function PatientsPage() {
                     <th className="px-5 py-3">أمراض مزمنة</th>
                     <th className="px-5 py-3">فاتورة 10$</th>
                     <th className="px-5 py-3">طريقة الدفع</th>
-                    <th className="px-5 py-3 text-left">العرض</th>
+                    <th className="px-5 py-3 text-left">الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody>
