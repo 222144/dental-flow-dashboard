@@ -277,6 +277,25 @@ function PatientsPage() {
     await loadPatients();
   }
 
+  async function handleDeletePatient(patientId: string, name: string) {
+    if (!confirm(`هل أنت متأكد من حذف المريض "${name}"؟ سيتم حذف فواتيره أيضًا.`)) return;
+    const { error: invErr } = await db
+      .from("patient_invoices")
+      .delete()
+      .eq("patient_id", patientId);
+    if (invErr) {
+      toast.error("تعذر حذف فواتير المريض");
+      return;
+    }
+    const { error } = await db.from("patients").delete().eq("id", patientId);
+    if (error) {
+      toast.error("تعذر حذف المريض");
+      return;
+    }
+    toast.success("تم حذف المريض");
+    await loadPatients();
+  }
+
   return (
     <AppShell>
       <div className="space-y-6">
