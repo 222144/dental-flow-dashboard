@@ -8,7 +8,6 @@ import {
   Loader2,
   Plus,
   Search,
-  Trash2,
   WalletCards,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,8 +40,6 @@ type QueryResult<T> = PromiseLike<{ data: T | null; error: DbError | null }>;
 type DbQuery<T = unknown> = QueryResult<T> & {
   select: <TResult = unknown>(columns?: string) => DbQuery<TResult>;
   insert: (values: Record<string, unknown>) => DbQuery<T>;
-  delete: () => DbQuery<T>;
-  eq: (column: string, value: string) => DbQuery<T>;
   order: (column: string, options?: { ascending: boolean }) => DbQuery<T>;
   single: () => DbQuery<T extends Array<infer Row> ? Row : T>;
 };
@@ -277,25 +274,6 @@ function PatientsPage() {
     await loadPatients();
   }
 
-  async function handleDeletePatient(patientId: string, name: string) {
-    if (!confirm(`هل أنت متأكد من حذف المريض "${name}"؟ سيتم حذف فواتيره أيضًا.`)) return;
-    const { error: invErr } = await db
-      .from("patient_invoices")
-      .delete()
-      .eq("patient_id", patientId);
-    if (invErr) {
-      toast.error("تعذر حذف فواتير المريض");
-      return;
-    }
-    const { error } = await db.from("patients").delete().eq("id", patientId);
-    if (error) {
-      toast.error("تعذر حذف المريض");
-      return;
-    }
-    toast.success("تم حذف المريض");
-    await loadPatients();
-  }
-
   return (
     <AppShell>
       <div className="space-y-6">
@@ -384,7 +362,7 @@ function PatientsPage() {
                     <th className="px-5 py-3">أمراض مزمنة</th>
                     <th className="px-5 py-3">فاتورة 10$</th>
                     <th className="px-5 py-3">طريقة الدفع</th>
-                    <th className="px-5 py-3 text-left">الإجراءات</th>
+                    <th className="px-5 py-3 text-left">العرض</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -429,20 +407,11 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <div className="inline-flex items-center gap-2">
-                              <Button asChild variant="secondary" size="sm">
-                                <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
-                                  <Eye className="h-4 w-4" /> عرض
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeletePatient(patient.id, patient.full_name)}
-                              >
-                                <Trash2 className="h-4 w-4" /> حذف
-                              </Button>
-                            </div>
+                            <Button asChild variant="secondary" size="sm">
+                              <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
+                                <Eye className="h-4 w-4" /> عرض الملف
+                              </Link>
+                            </Button>
                           </td>
                         </tr>
                       );
