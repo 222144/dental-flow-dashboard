@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  CreditCard,
   DollarSign,
   Eye,
   FilePlus2,
   Loader2,
   Plus,
   Search,
+  Sparkles,
   WalletCards,
 } from "lucide-react";
 import { toast } from "sonner";
