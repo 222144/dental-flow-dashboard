@@ -274,6 +274,62 @@ function PatientsPage() {
     await loadPatients();
   }
 
+  async function handleSeedSamples() {
+    if (!userId) {
+      toast.error("يرجى تسجيل الدخول أولًا");
+      return;
+    }
+    setSaving(true);
+
+    const samples = [
+      { full_name: "محمد علي حسن", age: 34, gender: "ذكر", phone: "0599123456", address: "غزة - الرمال", chronic_diseases: "ضغط الدم", notes: "حساسية من البنسلين", payNow: "paid", paymentMethod: "cash" },
+      { full_name: "سارة أحمد خليل", age: 28, gender: "أنثى", phone: "0598765432", address: "رام الله", chronic_diseases: "لا يوجد", notes: "زيارة أولى", payNow: "paid", paymentMethod: "card" },
+      { full_name: "خالد يوسف ناصر", age: 45, gender: "ذكر", phone: "0597111222", address: "نابلس", chronic_diseases: "سكري من النوع الثاني", notes: "يحتاج متابعة", payNow: "pending", paymentMethod: "cash" },
+      { full_name: "ليلى سامي درويش", age: 22, gender: "أنثى", phone: "0596333444", address: "الخليل", chronic_diseases: "لا يوجد", notes: "تقويم أسنان", payNow: "paid", paymentMethod: "card" },
+      { full_name: "أحمد عبد الله", age: 60, gender: "ذكر", phone: "0595555666", address: "القدس", chronic_diseases: "قلب، ضغط", notes: "حذر مع المخدر", payNow: "pending", paymentMethod: "cash" },
+      { full_name: "نور حسام أبو زيد", age: 30, gender: "أنثى", phone: "0594777888", address: "بيت لحم", chronic_diseases: "حساسية موسمية", notes: "تنظيف دوري", payNow: "paid", paymentMethod: "cash" },
+    ];
+
+    let success = 0;
+    for (const s of samples) {
+      const stamp = Date.now().toString().slice(-6) + Math.floor(Math.random() * 100);
+      const { data: patient, error: pErr } = await db
+        .from("patients")
+        .insert({
+          user_id: userId,
+          patient_number: `P-${stamp}`,
+          full_name: s.full_name,
+          age: s.age,
+          gender: s.gender,
+          phone: s.phone,
+          address: s.address,
+          chronic_diseases: s.chronic_diseases,
+          notes: s.notes,
+          status: "نشط",
+          last_visit: new Date().toISOString().slice(0, 10),
+        })
+        .select<{ id: string }>("id")
+        .single();
+      if (pErr || !patient) continue;
+      await db.from("patient_invoices").insert({
+        user_id: userId,
+        patient_id: patient.id,
+        invoice_number: `INV-${stamp}`,
+        amount: 10,
+        currency: "USD",
+        payment_status: s.payNow,
+        payment_method: s.paymentMethod,
+        paid_at: s.payNow === "paid" ? new Date().toISOString() : null,
+        notes: s.payNow === "paid" ? "تم دفع رسوم فتح الملف" : "الدفع مؤجل",
+      });
+      success++;
+    }
+
+    setSaving(false);
+    toast.success(`تمت إضافة ${success} مريض وهمي`);
+    await loadPatients();
+  }
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -284,12 +340,22 @@ function PatientsPage() {
               أضف المريض، افتح ملفه الطبي، وسجل فاتورة فتح الملف بقيمة 10 دولار.
             </p>
           </div>
-          <Button
-            onClick={() => setOpen(true)}
-            className="h-11 bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
-          >
-            <Plus className="h-4 w-4" /> إضافة مريض
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSeedSamples}
+              disabled={saving}
+              className="h-11"
+            >
+              <Sparkles className="h-4 w-4" /> إضافة مرضى وهميين
+            </Button>
+            <Button
+              onClick={() => setOpen(true)}
+              className="h-11 bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
+            >
+              <Plus className="h-4 w-4" /> إضافة مريض
+            </Button>
+          </div>
         </section>
 
         <div className="grid gap-4 md:grid-cols-3">
