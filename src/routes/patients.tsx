@@ -358,7 +358,7 @@ function PatientsPage() {
           </div>
         </section>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-1">
           <Card className="rounded-lg shadow-[var(--shadow-card)]">
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -368,28 +368,6 @@ function PatientsPage() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">{patients.length}</p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-lg shadow-[var(--shadow-card)]">
-            <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                مدفوع أولًا
-              </CardTitle>
-              <DollarSign className="h-5 w-5 text-success" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">${totalPaid.toFixed(2)}</p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-lg shadow-[var(--shadow-card)]">
-            <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                فواتير لاحقة
-              </CardTitle>
-              <WalletCards className="h-5 w-5 text-action" />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{pendingInvoices.length}</p>
             </CardContent>
           </Card>
         </div>
