@@ -423,48 +423,6 @@ function PatientsPage() {
           </Card>
         )}
 
-        <Card className="rounded-lg shadow-[var(--shadow-card)]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <CreditCard className="h-5 w-5 text-action" /> إدارة فواتير المرضى
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-right text-xs font-semibold text-muted-foreground">
-                  <th className="px-3 py-2">رقم الفاتورة</th>
-                  <th className="px-3 py-2">المريض</th>
-                  <th className="px-3 py-2">المبلغ</th>
-                  <th className="px-3 py-2">الحالة</th>
-                  <th className="px-3 py-2">الطريقة</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
-                      لا توجد فواتير بعد.
-                    </td>
-                  </tr>
-                ) : (
-                  invoices.map((invoice) => (
-                    <tr key={invoice.id} className="border-b border-border/70">
-                      <td className="px-3 py-3 font-medium">{invoice.invoice_number}</td>
-                      <td className="px-3 py-3">
-                        {patients.find((patient) => patient.id === invoice.patient_id)?.full_name ??
-                          "—"}
-                      </td>
-                      <td className="px-3 py-3">${Number(invoice.amount).toFixed(2)}</td>
-                      <td className="px-3 py-3">{paymentStatusLabel(invoice.payment_status)}</td>
-                      <td className="px-3 py-3">{paymentMethodLabel(invoice.payment_method)}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
