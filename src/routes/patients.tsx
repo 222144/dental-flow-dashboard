@@ -1,15 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  DollarSign,
   Eye,
   FilePlus2,
   Loader2,
+  Pencil,
   Plus,
   Search,
   Sparkles,
-  WalletCards,
+  Trash2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -40,6 +50,9 @@ type QueryResult<T> = PromiseLike<{ data: T | null; error: DbError | null }>;
 type DbQuery<T = unknown> = QueryResult<T> & {
   select: <TResult = unknown>(columns?: string) => DbQuery<TResult>;
   insert: (values: Record<string, unknown>) => DbQuery<T>;
+  update: (values: Record<string, unknown>) => DbQuery<T>;
+  delete: () => DbQuery<T>;
+  eq: (column: string, value: string) => DbQuery<T>;
   order: (column: string, options?: { ascending: boolean }) => DbQuery<T>;
   single: () => DbQuery<T extends Array<infer Row> ? Row : T>;
 };
@@ -120,6 +133,10 @@ function PatientsPage() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<PatientForm>(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewPatient, setViewPatient] = useState<PatientRow | null>(null);
+  const [showMedicalFile, setShowMedicalFile] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -221,6 +238,35 @@ function PatientsPage() {
 
     setSaving(true);
 
+    if (editingId) {
+      const { error: updateError } = await db
+        .from("patients")
+        .update({
+          full_name: fullName,
+          age,
+          gender: form.gender,
+          phone,
+          address: form.address.trim(),
+          chronic_diseases: form.chronicDiseases.trim(),
+          notes: form.notes.trim(),
+        })
+        .eq("id", editingId);
+
+      setSaving(false);
+
+      if (updateError) {
+        toast.error("تعذر تعديل بيانات المريض");
+        return;
+      }
+
+      toast.success("تم تعديل بيانات المريض");
+      setForm(emptyForm);
+      setEditingId(null);
+      setOpen(false);
+      await loadPatients();
+      return;
+    }
+
     const patientNumber = `P-${Date.now().toString().slice(-6)}`;
     const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 
@@ -271,6 +317,41 @@ function PatientsPage() {
     toast.success("تمت إضافة المريض وفتح ملفه الطبي");
     setForm(emptyForm);
     setOpen(false);
+    await loadPatients();
+  }
+
+  function handleEdit(patient: PatientRow) {
+    setEditingId(patient.id);
+    setForm({
+      fullName: patient.full_name,
+      age: patient.age?.toString() ?? "",
+      gender: patient.gender,
+      phone: patient.phone,
+      address: "",
+      chronicDiseases: patient.chronic_diseases,
+      notes: patient.notes,
+      payNow: "paid",
+      paymentMethod: "cash",
+    });
+    setOpen(true);
+  }
+
+  function handleView(patient: PatientRow) {
+    setViewPatient(patient);
+    setShowMedicalFile(false);
+  }
+
+  async function handleDelete() {
+    if (!deleteId) return;
+    setSaving(true);
+    const { error } = await db.from("patients").delete().eq("id", deleteId);
+    setSaving(false);
+    if (error) {
+      toast.error("تعذر حذف المريض");
+      return;
+    }
+    toast.success("تم حذف المريض");
+    setDeleteId(null);
     await loadPatients();
   }
 
@@ -406,7 +487,7 @@ function PatientsPage() {
                     <th className="px-5 py-3">أمراض مزمنة</th>
                     <th className="px-5 py-3">فاتورة 10$</th>
                     <th className="px-5 py-3">طريقة الدفع</th>
-                    <th className="px-5 py-3 text-left">العرض</th>
+                    <th className="px-5 py-3 text-left">الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -451,11 +532,17 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <Button asChild variant="secondary" size="sm">
-                              <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
-                                <Eye className="h-4 w-4" /> عرض الملف
-                              </Link>
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="secondary" size="sm" onClick={() => handleView(patient)}>
+                                <Eye className="h-4 w-4" /> عرض
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleEdit(patient)}>
+                                <Pencil className="h-4 w-4" /> تعديل
+                              </Button>
+                              <Button variant="destructive" size="sm" onClick={() => setDeleteId(patient.id)}>
+                                <Trash2 className="h-4 w-4" /> حذف
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -469,12 +556,23 @@ function PatientsPage() {
 
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(value) => {
+          setOpen(value);
+          if (!value) {
+            setEditingId(null);
+            setForm(emptyForm);
+          }
+        }}
+      >
         <DialogContent className="max-h-[92vh] overflow-y-auto text-right sm:max-w-3xl" dir="rtl">
           <DialogHeader className="text-right">
-            <DialogTitle>إضافة مريض جديد</DialogTitle>
+            <DialogTitle>{editingId ? "تعديل بيانات المريض" : "إضافة مريض جديد"}</DialogTitle>
             <DialogDescription>
-              سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار.
+              {editingId
+                ? "قم بتحديث بيانات المريض ثم احفظ التغييرات."
+                : "سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار."}
             </DialogDescription>
           </DialogHeader>
 
@@ -553,43 +651,47 @@ function PatientsPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-border bg-secondary/40 p-4">
-            <p className="mb-4 font-semibold">فاتورة فتح الملف: 10 دولار</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>هل سيدفع الآن؟</Label>
-                <Select
-                  value={form.payNow}
-                  onValueChange={(value: "paid" | "pending") => setForm({ ...form, payNow: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paid">يدفع الآن</SelectItem>
-                    <SelectItem value="pending">في وقت لاحق</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>طريقة الدفع</Label>
-                <Select
-                  value={form.paymentMethod}
-                  onValueChange={(value: "cash" | "card") =>
-                    setForm({ ...form, paymentMethod: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">بطاقة</SelectItem>
-                  </SelectContent>
-                </Select>
+          {!editingId && (
+            <div className="rounded-lg border border-border bg-secondary/40 p-4">
+              <p className="mb-4 font-semibold">فاتورة فتح الملف: 10 دولار</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>هل سيدفع الآن؟</Label>
+                  <Select
+                    value={form.payNow}
+                    onValueChange={(value: "paid" | "pending") =>
+                      setForm({ ...form, payNow: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paid">يدفع الآن</SelectItem>
+                      <SelectItem value="pending">في وقت لاحق</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>طريقة الدفع</Label>
+                  <Select
+                    value={form.paymentMethod}
+                    onValueChange={(value: "cash" | "card") =>
+                      setForm({ ...form, paymentMethod: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">بطاقة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
             <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
@@ -600,11 +702,95 @@ function PatientsPage() {
               disabled={saving}
               className="bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
             >
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} تمت الإضافة
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {editingId ? "حفظ التعديلات" : "تمت الإضافة"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!viewPatient}
+        onOpenChange={(value) => {
+          if (!value) {
+            setViewPatient(null);
+            setShowMedicalFile(false);
+          }
+        }}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto text-right sm:max-w-2xl" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>عرض بيانات المريض</DialogTitle>
+            <DialogDescription>
+              {viewPatient?.full_name} · {viewPatient?.patient_number}
+            </DialogDescription>
+          </DialogHeader>
+
+          {viewPatient && (
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <InfoBox label="الاسم" value={viewPatient.full_name} />
+                <InfoBox label="الرقم" value={viewPatient.patient_number} />
+                <InfoBox label="العمر" value={viewPatient.age ? `${viewPatient.age} سنة` : "—"} />
+                <InfoBox label="النوع" value={viewPatient.gender} />
+                <InfoBox label="الهاتف" value={viewPatient.phone || "—"} />
+                <InfoBox label="آخر زيارة" value={viewPatient.last_visit} />
+              </div>
+
+              {!showMedicalFile ? (
+                <Button
+                  onClick={() => setShowMedicalFile(true)}
+                  className="w-full bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
+                >
+                  <Eye className="h-4 w-4" /> عرض الملف الطبي
+                </Button>
+              ) : (
+                <div className="space-y-3 rounded-lg border border-border bg-secondary/30 p-4">
+                  <h3 className="text-base font-semibold text-foreground">الملف الطبي</h3>
+                  <InfoBox
+                    label="الأمراض المزمنة"
+                    value={viewPatient.chronic_diseases || "لا توجد أمراض مزمنة مسجلة."}
+                  />
+                  <InfoBox
+                    label="ملاحظات الطبيب"
+                    value={viewPatient.notes || "لا توجد ملاحظات إضافية."}
+                  />
+                  <InfoBox label="الحالة" value={viewPatient.status} />
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(value) => !value && setDeleteId(null)}>
+        <AlertDialogContent dir="rtl" className="text-right">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد حذف المريض</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف بيانات المريض وفواتيره نهائيًا. لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
+  );
+}
+
+function InfoBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-background p-3">
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-1 whitespace-pre-wrap text-sm font-medium text-foreground">{value}</p>
+    </div>
   );
 }
