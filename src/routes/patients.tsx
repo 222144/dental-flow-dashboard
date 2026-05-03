@@ -487,7 +487,7 @@ function PatientsPage() {
                     <th className="px-5 py-3">أمراض مزمنة</th>
                     <th className="px-5 py-3">فاتورة 10$</th>
                     <th className="px-5 py-3">طريقة الدفع</th>
-                    <th className="px-5 py-3 text-left">العرض</th>
+                    <th className="px-5 py-3 text-left">الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -532,11 +532,17 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <Button asChild variant="secondary" size="sm">
-                              <Link to="/patients/$patientId" params={{ patientId: patient.id }}>
-                                <Eye className="h-4 w-4" /> عرض الملف
-                              </Link>
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="secondary" size="sm" onClick={() => handleView(patient)}>
+                                <Eye className="h-4 w-4" /> عرض
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleEdit(patient)}>
+                                <Pencil className="h-4 w-4" /> تعديل
+                              </Button>
+                              <Button variant="destructive" size="sm" onClick={() => setDeleteId(patient.id)}>
+                                <Trash2 className="h-4 w-4" /> حذف
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       );
