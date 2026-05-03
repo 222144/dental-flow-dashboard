@@ -651,43 +651,47 @@ function PatientsPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-border bg-secondary/40 p-4">
-            <p className="mb-4 font-semibold">فاتورة فتح الملف: 10 دولار</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>هل سيدفع الآن؟</Label>
-                <Select
-                  value={form.payNow}
-                  onValueChange={(value: "paid" | "pending") => setForm({ ...form, payNow: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paid">يدفع الآن</SelectItem>
-                    <SelectItem value="pending">في وقت لاحق</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>طريقة الدفع</Label>
-                <Select
-                  value={form.paymentMethod}
-                  onValueChange={(value: "cash" | "card") =>
-                    setForm({ ...form, paymentMethod: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">بطاقة</SelectItem>
-                  </SelectContent>
-                </Select>
+          {!editingId && (
+            <div className="rounded-lg border border-border bg-secondary/40 p-4">
+              <p className="mb-4 font-semibold">فاتورة فتح الملف: 10 دولار</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>هل سيدفع الآن؟</Label>
+                  <Select
+                    value={form.payNow}
+                    onValueChange={(value: "paid" | "pending") =>
+                      setForm({ ...form, payNow: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paid">يدفع الآن</SelectItem>
+                      <SelectItem value="pending">في وقت لاحق</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>طريقة الدفع</Label>
+                  <Select
+                    value={form.paymentMethod}
+                    onValueChange={(value: "cash" | "card") =>
+                      setForm({ ...form, paymentMethod: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">بطاقة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
             <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
@@ -698,7 +702,8 @@ function PatientsPage() {
               disabled={saving}
               className="bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
             >
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} تمت الإضافة
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {editingId ? "حفظ التعديلات" : "تمت الإضافة"}
             </Button>
           </DialogFooter>
         </DialogContent>
