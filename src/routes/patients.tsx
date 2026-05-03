@@ -556,12 +556,23 @@ function PatientsPage() {
 
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(value) => {
+          setOpen(value);
+          if (!value) {
+            setEditingId(null);
+            setForm(emptyForm);
+          }
+        }}
+      >
         <DialogContent className="max-h-[92vh] overflow-y-auto text-right sm:max-w-3xl" dir="rtl">
           <DialogHeader className="text-right">
-            <DialogTitle>إضافة مريض جديد</DialogTitle>
+            <DialogTitle>{editingId ? "تعديل بيانات المريض" : "إضافة مريض جديد"}</DialogTitle>
             <DialogDescription>
-              سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار.
+              {editingId
+                ? "قم بتحديث بيانات المريض ثم احفظ التغييرات."
+                : "سيتم فتح ملف طبي للمريض وإنشاء فاتورة أولية بقيمة 10 دولار."}
             </DialogDescription>
           </DialogHeader>
 
