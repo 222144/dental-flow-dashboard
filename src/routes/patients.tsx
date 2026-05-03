@@ -133,6 +133,10 @@ function PatientsPage() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<PatientForm>(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewPatient, setViewPatient] = useState<PatientRow | null>(null);
+  const [showMedicalFile, setShowMedicalFile] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
