@@ -238,6 +238,35 @@ function PatientsPage() {
 
     setSaving(true);
 
+    if (editingId) {
+      const { error: updateError } = await db
+        .from("patients")
+        .update({
+          full_name: fullName,
+          age,
+          gender: form.gender,
+          phone,
+          address: form.address.trim(),
+          chronic_diseases: form.chronicDiseases.trim(),
+          notes: form.notes.trim(),
+        })
+        .eq("id", editingId);
+
+      setSaving(false);
+
+      if (updateError) {
+        toast.error("تعذر تعديل بيانات المريض");
+        return;
+      }
+
+      toast.success("تم تعديل بيانات المريض");
+      setForm(emptyForm);
+      setEditingId(null);
+      setOpen(false);
+      await loadPatients();
+      return;
+    }
+
     const patientNumber = `P-${Date.now().toString().slice(-6)}`;
     const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
 
@@ -288,6 +317,41 @@ function PatientsPage() {
     toast.success("تمت إضافة المريض وفتح ملفه الطبي");
     setForm(emptyForm);
     setOpen(false);
+    await loadPatients();
+  }
+
+  function handleEdit(patient: PatientRow) {
+    setEditingId(patient.id);
+    setForm({
+      fullName: patient.full_name,
+      age: patient.age?.toString() ?? "",
+      gender: patient.gender,
+      phone: patient.phone,
+      address: "",
+      chronicDiseases: patient.chronic_diseases,
+      notes: patient.notes,
+      payNow: "paid",
+      paymentMethod: "cash",
+    });
+    setOpen(true);
+  }
+
+  function handleView(patient: PatientRow) {
+    setViewPatient(patient);
+    setShowMedicalFile(false);
+  }
+
+  async function handleDelete() {
+    if (!deleteId) return;
+    setSaving(true);
+    const { error } = await db.from("patients").delete().eq("id", deleteId);
+    setSaving(false);
+    if (error) {
+      toast.error("تعذر حذف المريض");
+      return;
+    }
+    toast.success("تم حذف المريض");
+    setDeleteId(null);
     await loadPatients();
   }
 
