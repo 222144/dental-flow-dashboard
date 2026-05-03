@@ -1,10 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
 
 function ToothLogo({ className }: { className?: string }) {
   return (
@@ -37,14 +41,53 @@ export const Route = createFileRoute("/login")({
     meta: [
       { title: "تسجيل دخول العيادة" },
       { name: "description", content: "واجهة تسجيل دخول نظام إدارة عيادة الأسنان" },
-      { property: "og:title", content: "تسجيل دخول العيادة" },
-      { property: "og:description", content: "واجهة دخول لوحة تحكم العيادة" },
     ],
   }),
   component: LoginPage,
 });
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/" });
+    });
+  }, [navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      toast.error("فشل تسجيل الدخول: " + error.message);
+      return;
+    }
+    toast.success("تم تسجيل الدخول بنجاح");
+    navigate({ to: "/" });
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const redirectUrl = `${window.location.origin}/`;
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: redirectUrl },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error("فشل إنشاء الحساب: " + error.message);
+      return;
+    }
+    toast.success("تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول");
+  };
+
   return (
     <main className="grid min-h-screen grid-cols-1 bg-background lg:grid-cols-[1.05fr_0.95fr]">
       <section className="relative hidden overflow-hidden border-l border-border bg-card lg:block">
@@ -102,38 +145,48 @@ function LoginPage() {
 
           <Card className="rounded-lg shadow-lg">
             <CardHeader className="space-y-3 text-center">
-              <CardTitle className="text-2xl">تسجيل الدخول</CardTitle>
-              <CardDescription>أدخل بياناتك للوصول إلى لوحة إدارة العيادة</CardDescription>
+              <CardTitle className="text-2xl">مرحباً بك</CardTitle>
+              <CardDescription>سجّل الدخول أو أنشئ حساباً جديداً للوصول إلى لوحة الإدارة</CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email">البريد الإلكتروني</Label>
-                  <Input id="email" type="email" placeholder="name@clinic.com" className="h-11" />
-                </div>
+              <Tabs defaultValue="signin" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="signin">تسجيل الدخول</TabsTrigger>
+                  <TabsTrigger value="signup">إنشاء حساب</TabsTrigger>
+                </TabsList>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label htmlFor="password">كلمة المرور</Label>
-                    <button type="button" className="text-sm font-medium text-primary hover:underline">
-                      نسيت كلمة المرور؟
-                    </button>
-                  </div>
-                  <Input id="password" type="password" placeholder="••••••••" className="h-11" />
-                </div>
+                <TabsContent value="signin">
+                  <form className="space-y-5" onSubmit={handleSignIn}>
+                    <div className="space-y-2">
+                      <Label htmlFor="email-in">البريد الإلكتروني</Label>
+                      <Input id="email-in" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@clinic.com" className="h-11" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password-in">كلمة المرور</Label>
+                      <Input id="password-in" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-11" />
+                    </div>
+                    <Button type="submit" disabled={loading} className="h-11 w-full text-base">
+                      {loading ? "جاري الدخول..." : "دخول"}
+                    </Button>
+                  </form>
+                </TabsContent>
 
-                <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-3">
-                  <label className="flex items-center gap-2 text-sm text-foreground">
-                    <input type="checkbox" className="h-4 w-4 accent-primary" />
-                    تذكرني
-                  </label>
-                  <span className="text-xs text-muted-foreground">للموظفين المصرح لهم فقط</span>
-                </div>
-
-                <Button type="button" className="h-11 w-full text-base">
-                  دخول
-                </Button>
-              </form>
+                <TabsContent value="signup">
+                  <form className="space-y-5" onSubmit={handleSignUp}>
+                    <div className="space-y-2">
+                      <Label htmlFor="email-up">البريد الإلكتروني</Label>
+                      <Input id="email-up" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@clinic.com" className="h-11" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password-up">كلمة المرور</Label>
+                      <Input id="password-up" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6 أحرف على الأقل" className="h-11" />
+                    </div>
+                    <Button type="submit" disabled={loading} className="h-11 w-full text-base">
+                      {loading ? "جاري الإنشاء..." : "إنشاء حساب"}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>
