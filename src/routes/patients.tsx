@@ -708,6 +708,89 @@ function PatientsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={!!viewPatient}
+        onOpenChange={(value) => {
+          if (!value) {
+            setViewPatient(null);
+            setShowMedicalFile(false);
+          }
+        }}
+      >
+        <DialogContent className="max-h-[92vh] overflow-y-auto text-right sm:max-w-2xl" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>عرض بيانات المريض</DialogTitle>
+            <DialogDescription>
+              {viewPatient?.full_name} · {viewPatient?.patient_number}
+            </DialogDescription>
+          </DialogHeader>
+
+          {viewPatient && (
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <InfoBox label="الاسم" value={viewPatient.full_name} />
+                <InfoBox label="الرقم" value={viewPatient.patient_number} />
+                <InfoBox label="العمر" value={viewPatient.age ? `${viewPatient.age} سنة` : "—"} />
+                <InfoBox label="النوع" value={viewPatient.gender} />
+                <InfoBox label="الهاتف" value={viewPatient.phone || "—"} />
+                <InfoBox label="آخر زيارة" value={viewPatient.last_visit} />
+              </div>
+
+              {!showMedicalFile ? (
+                <Button
+                  onClick={() => setShowMedicalFile(true)}
+                  className="w-full bg-[image:var(--gradient-action)] text-action-foreground hover:brightness-105"
+                >
+                  <Eye className="h-4 w-4" /> عرض الملف الطبي
+                </Button>
+              ) : (
+                <div className="space-y-3 rounded-lg border border-border bg-secondary/30 p-4">
+                  <h3 className="text-base font-semibold text-foreground">الملف الطبي</h3>
+                  <InfoBox
+                    label="الأمراض المزمنة"
+                    value={viewPatient.chronic_diseases || "لا توجد أمراض مزمنة مسجلة."}
+                  />
+                  <InfoBox
+                    label="ملاحظات الطبيب"
+                    value={viewPatient.notes || "لا توجد ملاحظات إضافية."}
+                  />
+                  <InfoBox label="الحالة" value={viewPatient.status} />
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(value) => !value && setDeleteId(null)}>
+        <AlertDialogContent dir="rtl" className="text-right">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد حذف المريض</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف بيانات المريض وفواتيره نهائيًا. لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
+  );
+}
+
+function InfoBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-background p-3">
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-1 whitespace-pre-wrap text-sm font-medium text-foreground">{value}</p>
+    </div>
   );
 }
