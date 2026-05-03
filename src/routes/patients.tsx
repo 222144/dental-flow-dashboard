@@ -50,6 +50,9 @@ type QueryResult<T> = PromiseLike<{ data: T | null; error: DbError | null }>;
 type DbQuery<T = unknown> = QueryResult<T> & {
   select: <TResult = unknown>(columns?: string) => DbQuery<TResult>;
   insert: (values: Record<string, unknown>) => DbQuery<T>;
+  update: (values: Record<string, unknown>) => DbQuery<T>;
+  delete: () => DbQuery<T>;
+  eq: (column: string, value: string) => DbQuery<T>;
   order: (column: string, options?: { ascending: boolean }) => DbQuery<T>;
   single: () => DbQuery<T extends Array<infer Row> ? Row : T>;
 };
