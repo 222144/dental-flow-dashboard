@@ -87,7 +87,7 @@ export function DataTable<T extends { id: string | number }>({
 
   if (dialogMode && activeRow) {
     return (
-      <section className="space-y-6">
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-background p-6 space-y-6" dir="rtl">
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <div>
@@ -149,7 +149,7 @@ export function DataTable<T extends { id: string | number }>({
             </div>
           </div>
         )}
-      </section>
+      </div>
     );
   }
 
