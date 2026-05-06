@@ -25,6 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type DbError = { message: string };
 type QueryResult<T> = PromiseLike<{ data: T | null; error: DbError | null }>;
@@ -175,6 +185,7 @@ function InvoicesPage() {
   const [seeding, setSeeding] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [confirmInvoice, setConfirmInvoice] = useState<InvoiceRow | null>(null);
 
   useEffect(() => {
     loadData();
@@ -493,7 +504,7 @@ function InvoicesPage() {
                                   size="sm"
                                   variant="outline"
                                   disabled={updatingId === inv.id}
-                                  onClick={() => markAsPaid(inv)}
+                                  onClick={() => setConfirmInvoice(inv)}
                                 >
                                   {updatingId === inv.id ? (
                                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -526,6 +537,41 @@ function InvoicesPage() {
           </CardContent>
         </Card>
       </div>
+      <AlertDialog
+        open={Boolean(confirmInvoice)}
+        onOpenChange={(open) => !open && setConfirmInvoice(null)}
+      >
+        <AlertDialogContent dir="rtl" className="text-right">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد دفع الفاتورة</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من تحديد الفاتورة{" "}
+              <span className="font-mono font-semibold">
+                {confirmInvoice?.invoice_number}
+              </span>{" "}
+              بمبلغ{" "}
+              <span className="font-semibold">
+                ${Number(confirmInvoice?.amount ?? 0).toFixed(2)}
+              </span>{" "}
+              كمدفوعة؟ لا يمكن التراجع عن هذا الإجراء بسهولة.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmInvoice) {
+                  const inv = confirmInvoice;
+                  setConfirmInvoice(null);
+                  void markAsPaid(inv);
+                }
+              }}
+            >
+              تأكيد الدفع
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
