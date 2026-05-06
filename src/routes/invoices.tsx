@@ -308,7 +308,7 @@ function InvoicesPage() {
     }
   }
 
-  async function markAsPaid(invoice: InvoiceRow) {
+  async function markAsPaid(invoice: InvoiceRow, method: "cash" | "card", amount: number) {
     setUpdatingId(invoice.id);
     const { error } = await db
       .from("patient_invoices")
