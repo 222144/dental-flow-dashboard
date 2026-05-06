@@ -562,25 +562,54 @@ function InvoicesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد دفع الفاتورة</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من تحديد الفاتورة{" "}
+              تأكيد دفع الفاتورة{" "}
               <span className="font-mono font-semibold">
                 {confirmInvoice?.invoice_number}
-              </span>{" "}
-              بمبلغ{" "}
-              <span className="font-semibold">
-                ${Number(confirmInvoice?.amount ?? 0).toFixed(2)}
-              </span>{" "}
-              كمدفوعة؟ لا يمكن التراجع عن هذا الإجراء بسهولة.
+              </span>
+              . يرجى تحديد طريقة الدفع والمبلغ ثم الضغط على تأكيد.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">طريقة الدفع</label>
+              <Select
+                value={confirmMethod}
+                onValueChange={(v) => setConfirmMethod(v as "cash" | "card")}
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">بطاقة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">المبلغ (USD)</label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={confirmAmount}
+                onChange={(e) => setConfirmAmount(e.target.value)}
+              />
+            </div>
+          </div>
           <AlertDialogFooter className="gap-2 sm:justify-start sm:space-x-0">
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (confirmInvoice) {
                   const inv = confirmInvoice;
+                  const amt = Number(confirmAmount);
+                  if (!Number.isFinite(amt) || amt < 0) {
+                    toast.error("المبلغ غير صالح");
+                    return;
+                  }
+                  const method = confirmMethod;
                   setConfirmInvoice(null);
-                  void markAsPaid(inv);
+                  void markAsPaid(inv, method, amt);
                 }
               }}
             >
