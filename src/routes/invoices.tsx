@@ -185,6 +185,7 @@ function InvoicesPage() {
   const [seeding, setSeeding] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [confirmInvoice, setConfirmInvoice] = useState<InvoiceRow | null>(null);
 
   useEffect(() => {
     loadData();
