@@ -517,7 +517,11 @@ function InvoicesPage() {
                                   size="sm"
                                   variant="outline"
                                   disabled={updatingId === inv.id}
-                                  onClick={() => setConfirmInvoice(inv)}
+                                  onClick={() => {
+                                    setConfirmMethod(inv.payment_method);
+                                    setConfirmAmount(String(inv.amount));
+                                    setConfirmInvoice(inv);
+                                  }}
                                 >
                                   {updatingId === inv.id ? (
                                     <Loader2 className="h-3 w-3 animate-spin" />
