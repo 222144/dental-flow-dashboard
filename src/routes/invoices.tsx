@@ -537,6 +537,41 @@ function InvoicesPage() {
           </CardContent>
         </Card>
       </div>
+      <AlertDialog
+        open={Boolean(confirmInvoice)}
+        onOpenChange={(open) => !open && setConfirmInvoice(null)}
+      >
+        <AlertDialogContent dir="rtl" className="text-right">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد دفع الفاتورة</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من تحديد الفاتورة{" "}
+              <span className="font-mono font-semibold">
+                {confirmInvoice?.invoice_number}
+              </span>{" "}
+              بمبلغ{" "}
+              <span className="font-semibold">
+                ${Number(confirmInvoice?.amount ?? 0).toFixed(2)}
+              </span>{" "}
+              كمدفوعة؟ لا يمكن التراجع عن هذا الإجراء بسهولة.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmInvoice) {
+                  const inv = confirmInvoice;
+                  setConfirmInvoice(null);
+                  void markAsPaid(inv);
+                }
+              }}
+            >
+              تأكيد الدفع
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
