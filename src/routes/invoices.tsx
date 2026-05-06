@@ -521,7 +521,7 @@ function InvoicesPage() {
                                     params={{ patientId: patient.id }}
                                   >
                                     <Eye className="h-3 w-3" />
-                                    الملف
+                                    عرض
                                   </Link>
                                 </Button>
                               )}
