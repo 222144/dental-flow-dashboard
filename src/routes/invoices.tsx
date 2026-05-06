@@ -504,7 +504,7 @@ function InvoicesPage() {
                                   size="sm"
                                   variant="outline"
                                   disabled={updatingId === inv.id}
-                                  onClick={() => markAsPaid(inv)}
+                                  onClick={() => setConfirmInvoice(inv)}
                                 >
                                   {updatingId === inv.id ? (
                                     <Loader2 className="h-3 w-3 animate-spin" />
