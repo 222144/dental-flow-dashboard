@@ -312,7 +312,12 @@ function InvoicesPage() {
     setUpdatingId(invoice.id);
     const { error } = await db
       .from("patient_invoices")
-      .update({ payment_status: "paid", paid_at: new Date().toISOString() })
+      .update({
+        payment_status: "paid",
+        payment_method: method,
+        amount,
+        paid_at: new Date().toISOString(),
+      })
       .eq("id", invoice.id);
     setUpdatingId(null);
 
@@ -325,7 +330,13 @@ function InvoicesPage() {
     setInvoices((prev) =>
       prev.map((i) =>
         i.id === invoice.id
-          ? { ...i, payment_status: "paid", paid_at: new Date().toISOString() }
+          ? {
+              ...i,
+              payment_status: "paid",
+              payment_method: method,
+              amount,
+              paid_at: new Date().toISOString(),
+            }
           : i,
       ),
     );
