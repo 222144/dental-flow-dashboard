@@ -188,6 +188,7 @@ function InvoicesPage() {
   const [confirmInvoice, setConfirmInvoice] = useState<InvoiceRow | null>(null);
   const [confirmMethod, setConfirmMethod] = useState<"cash" | "card">("cash");
   const [confirmAmount, setConfirmAmount] = useState<string>("");
+  const [viewInvoice, setViewInvoice] = useState<InvoiceRow | null>(null);
 
   useEffect(() => {
     loadData();
