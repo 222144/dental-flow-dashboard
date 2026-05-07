@@ -624,6 +624,79 @@ function InvoicesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={Boolean(viewInvoice)}
+        onOpenChange={(open) => !open && setViewInvoice(null)}
+      >
+        <DialogContent dir="rtl" className="text-right sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>تفاصيل الفاتورة</DialogTitle>
+            <DialogDescription>
+              عرض كامل تفاصيل الفاتورة وحالة الدفع.
+            </DialogDescription>
+          </DialogHeader>
+          {viewInvoice && (() => {
+            const p = patientMap.get(viewInvoice.patient_id);
+            const price = Number(viewInvoice.amount);
+            const discount = 0;
+            const finalPrice = price - discount;
+            return (
+              <div className="space-y-3 text-sm">
+                <Row label="رقم الفاتورة" value={<span className="font-mono">{viewInvoice.invoice_number}</span>} />
+                <Row label="اسم المريض" value={p?.full_name ?? "—"} />
+                <Row label="سبب الفاتورة" value={viewInvoice.description || "فتح ملف طبي"} />
+                <Row label="السعر" value={`$${price.toFixed(2)}`} />
+                <Row label="الخصم" value={`$${discount.toFixed(2)}`} />
+                <Row label="السعر بعد الخصم" value={<span className="font-semibold">${finalPrice.toFixed(2)}</span>} />
+                <Row
+                  label="الحالة"
+                  value={
+                    <span
+                      className={`inline-flex rounded-md px-2 py-0.5 text-xs font-medium ${
+                        viewInvoice.payment_status === "paid"
+                          ? "bg-success/15 text-success"
+                          : "bg-action/15 text-action"
+                      }`}
+                    >
+                      {viewInvoice.payment_status === "paid" ? "مدفوعة" : "غير مدفوعة"}
+                    </span>
+                  }
+                />
+                {viewInvoice.payment_status === "paid" && (
+                  <Row
+                    label="طريقة الدفع"
+                    value={
+                      <span className="inline-flex items-center gap-1">
+                        <CreditCard className="h-3 w-3" />
+                        {viewInvoice.payment_method === "cash" ? "Cash" : "Card"}
+                      </span>
+                    }
+                  />
+                )}
+                <Row
+                  label="تاريخ إصدار الفاتورة"
+                  value={new Date(viewInvoice.created_at).toLocaleDateString("ar-EG")}
+                />
+              </div>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewInvoice(null)}>
+              إغلاق
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
+  );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-border pb-2 last:border-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span>{value}</span>
+    </div>
   );
 }
