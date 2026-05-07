@@ -540,17 +540,14 @@ function InvoicesPage() {
                                   تحديد كمدفوعة
                                 </Button>
                               )}
-                              {patient && (
-                                <Button asChild size="sm" variant="ghost">
-                                  <Link
-                                    to="/patients/$patientId"
-                                    params={{ patientId: patient.id }}
-                                  >
-                                    <Eye className="h-3 w-3" />
-                                    عرض
-                                  </Link>
-                                </Button>
-                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setViewInvoice(inv)}
+                              >
+                                <Eye className="h-3 w-3" />
+                                عرض
+                              </Button>
                             </div>
                           </td>
                         </tr>
