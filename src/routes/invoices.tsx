@@ -692,7 +692,7 @@ function InvoicesPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
+function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-border pb-2 last:border-0">
       <span className="text-muted-foreground">{label}</span>
