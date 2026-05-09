@@ -867,6 +867,96 @@ function PatientsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={!!accountPatient}
+        onOpenChange={(v) => {
+          if (!v) setAccountPatient(null);
+        }}
+      >
+        <DialogContent className="text-right sm:max-w-md" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>إنشاء حساب دخول للمريض</DialogTitle>
+            <DialogDescription>
+              {accountPatient?.full_name} — يستطيع المريض بعدها تسجيل الدخول لرؤية ملفه ومواعيده وفواتيره.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>البريد الإلكتروني</Label>
+              <Input
+                type="email"
+                value={accountEmail}
+                onChange={(e) => setAccountEmail(e.target.value)}
+                placeholder="patient@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>كلمة مرور مؤقتة</Label>
+              <Input
+                type="text"
+                value={accountPassword}
+                onChange={(e) => setAccountPassword(e.target.value)}
+                placeholder="6 أحرف على الأقل"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <Button variant="outline" onClick={() => setAccountPatient(null)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button onClick={handleCreateAccount} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />} إنشاء الحساب
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!apptPatient}
+        onOpenChange={(v) => {
+          if (!v) setApptPatient(null);
+        }}
+      >
+        <DialogContent className="text-right sm:max-w-md" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>إضافة موعد</DialogTitle>
+            <DialogDescription>
+              للمريض: {apptPatient?.full_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>اسم الطبيب</Label>
+              <Input value={apptDoctor} onChange={(e) => setApptDoctor(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>التخصص</Label>
+              <Input value={apptSpecialty} onChange={(e) => setApptSpecialty(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>تاريخ ووقت الموعد</Label>
+              <Input
+                type="datetime-local"
+                value={apptDateTime}
+                onChange={(e) => setApptDateTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>ملاحظات</Label>
+              <Textarea value={apptNotes} onChange={(e) => setApptNotes(e.target.value)} maxLength={500} />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <Button variant="outline" onClick={() => setApptPatient(null)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button onClick={handleAddAppointment} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />} حفظ الموعد
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
