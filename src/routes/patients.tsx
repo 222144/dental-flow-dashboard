@@ -140,6 +140,14 @@ function PatientsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [viewPatient, setViewPatient] = useState<PatientRow | null>(null);
   const [showMedicalFile, setShowMedicalFile] = useState(false);
+  const [accountPatient, setAccountPatient] = useState<PatientRow | null>(null);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [apptPatient, setApptPatient] = useState<PatientRow | null>(null);
+  const [apptDoctor, setApptDoctor] = useState("");
+  const [apptSpecialty, setApptSpecialty] = useState("");
+  const [apptDateTime, setApptDateTime] = useState("");
+  const [apptNotes, setApptNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
