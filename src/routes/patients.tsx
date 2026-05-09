@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  CalendarPlus,
   Eye,
   FilePlus2,
+  KeyRound,
   Loader2,
   Pencil,
   Plus,
@@ -81,6 +83,7 @@ type PatientRow = {
   notes: string;
   status: string;
   last_visit: string;
+  account_user_id: string | null;
 };
 
 type InvoiceRow = {
@@ -137,6 +140,14 @@ function PatientsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [viewPatient, setViewPatient] = useState<PatientRow | null>(null);
   const [showMedicalFile, setShowMedicalFile] = useState(false);
+  const [accountPatient, setAccountPatient] = useState<PatientRow | null>(null);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [apptPatient, setApptPatient] = useState<PatientRow | null>(null);
+  const [apptDoctor, setApptDoctor] = useState("");
+  const [apptSpecialty, setApptSpecialty] = useState("");
+  const [apptDateTime, setApptDateTime] = useState("");
+  const [apptNotes, setApptNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -184,7 +195,7 @@ function PatientsPage() {
       db
         .from("patients")
         .select(
-          "id, patient_number, full_name, age, gender, phone, chronic_diseases, notes, status, last_visit",
+          "id, patient_number, full_name, age, gender, phone, chronic_diseases, notes, status, last_visit, account_user_id",
         )
         .order("created_at", { ascending: false }),
       db
@@ -411,6 +422,58 @@ function PatientsPage() {
     await loadPatients();
   }
 
+  async function handleCreateAccount() {
+    if (!accountPatient) return;
+    const email = accountEmail.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email) || accountPassword.length < 6) {
+      toast.error("بريد غير صحيح أو كلمة المرور أقل من 6 أحرف");
+      return;
+    }
+    setSaving(true);
+    const { data, error } = await supabase.functions.invoke("create-patient-account", {
+      body: { patient_id: accountPatient.id, email, password: accountPassword },
+    });
+    setSaving(false);
+    if (error || (data as { error?: string })?.error) {
+      toast.error("تعذر إنشاء الحساب: " + (error?.message ?? (data as { error?: string })?.error ?? ""));
+      return;
+    }
+    toast.success("تم إنشاء حساب دخول للمريض");
+    setAccountPatient(null);
+    setAccountEmail("");
+    setAccountPassword("");
+    await loadPatients();
+  }
+
+  async function handleAddAppointment() {
+    if (!apptPatient || !userId) return;
+    if (!apptDoctor.trim() || !apptDateTime) {
+      toast.error("اسم الطبيب وتاريخ الموعد مطلوبان");
+      return;
+    }
+    setSaving(true);
+    const { error } = await db.from("appointments").insert({
+      user_id: userId,
+      patient_id: apptPatient.id,
+      doctor_name: apptDoctor.trim(),
+      doctor_specialty: apptSpecialty.trim(),
+      scheduled_at: new Date(apptDateTime).toISOString(),
+      notes: apptNotes.trim(),
+      status: "scheduled",
+    });
+    setSaving(false);
+    if (error) {
+      toast.error("تعذر إضافة الموعد");
+      return;
+    }
+    toast.success("تمت إضافة الموعد");
+    setApptPatient(null);
+    setApptDoctor("");
+    setApptSpecialty("");
+    setApptDateTime("");
+    setApptNotes("");
+  }
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -532,12 +595,34 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <div className="flex justify-end gap-2">
+                            <div className="flex flex-wrap justify-end gap-2">
                               <Button variant="secondary" size="sm" onClick={() => handleView(patient)}>
                                 <Eye className="h-4 w-4" /> عرض
                               </Button>
                               <Button variant="outline" size="sm" onClick={() => handleEdit(patient)}>
                                 <Pencil className="h-4 w-4" /> تعديل
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setApptPatient(patient);
+                                }}
+                              >
+                                <CalendarPlus className="h-4 w-4" /> موعد
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!!patient.account_user_id}
+                                onClick={() => {
+                                  setAccountPatient(patient);
+                                  setAccountEmail("");
+                                  setAccountPassword("");
+                                }}
+                              >
+                                <KeyRound className="h-4 w-4" />{" "}
+                                {patient.account_user_id ? "حساب موجود" : "إنشاء حساب"}
                               </Button>
                               <Button variant="destructive" size="sm" onClick={() => setDeleteId(patient.id)}>
                                 <Trash2 className="h-4 w-4" /> حذف
@@ -782,6 +867,96 @@ function PatientsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={!!accountPatient}
+        onOpenChange={(v) => {
+          if (!v) setAccountPatient(null);
+        }}
+      >
+        <DialogContent className="text-right sm:max-w-md" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>إنشاء حساب دخول للمريض</DialogTitle>
+            <DialogDescription>
+              {accountPatient?.full_name} — يستطيع المريض بعدها تسجيل الدخول لرؤية ملفه ومواعيده وفواتيره.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>البريد الإلكتروني</Label>
+              <Input
+                type="email"
+                value={accountEmail}
+                onChange={(e) => setAccountEmail(e.target.value)}
+                placeholder="patient@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>كلمة مرور مؤقتة</Label>
+              <Input
+                type="text"
+                value={accountPassword}
+                onChange={(e) => setAccountPassword(e.target.value)}
+                placeholder="6 أحرف على الأقل"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <Button variant="outline" onClick={() => setAccountPatient(null)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button onClick={handleCreateAccount} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />} إنشاء الحساب
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!apptPatient}
+        onOpenChange={(v) => {
+          if (!v) setApptPatient(null);
+        }}
+      >
+        <DialogContent className="text-right sm:max-w-md" dir="rtl">
+          <DialogHeader className="text-right">
+            <DialogTitle>إضافة موعد</DialogTitle>
+            <DialogDescription>
+              للمريض: {apptPatient?.full_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>اسم الطبيب</Label>
+              <Input value={apptDoctor} onChange={(e) => setApptDoctor(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>التخصص</Label>
+              <Input value={apptSpecialty} onChange={(e) => setApptSpecialty(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>تاريخ ووقت الموعد</Label>
+              <Input
+                type="datetime-local"
+                value={apptDateTime}
+                onChange={(e) => setApptDateTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>ملاحظات</Label>
+              <Textarea value={apptNotes} onChange={(e) => setApptNotes(e.target.value)} maxLength={500} />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-start sm:space-x-0">
+            <Button variant="outline" onClick={() => setApptPatient(null)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button onClick={handleAddAppointment} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />} حفظ الموعد
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
