@@ -595,12 +595,34 @@ function PatientsPage() {
                             {invoice ? paymentMethodLabel(invoice.payment_method) : "—"}
                           </td>
                           <td className="px-5 py-4 text-left">
-                            <div className="flex justify-end gap-2">
+                            <div className="flex flex-wrap justify-end gap-2">
                               <Button variant="secondary" size="sm" onClick={() => handleView(patient)}>
                                 <Eye className="h-4 w-4" /> عرض
                               </Button>
                               <Button variant="outline" size="sm" onClick={() => handleEdit(patient)}>
                                 <Pencil className="h-4 w-4" /> تعديل
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setApptPatient(patient);
+                                }}
+                              >
+                                <CalendarPlus className="h-4 w-4" /> موعد
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={!!patient.account_user_id}
+                                onClick={() => {
+                                  setAccountPatient(patient);
+                                  setAccountEmail("");
+                                  setAccountPassword("");
+                                }}
+                              >
+                                <KeyRound className="h-4 w-4" />{" "}
+                                {patient.account_user_id ? "حساب موجود" : "إنشاء حساب"}
                               </Button>
                               <Button variant="destructive" size="sm" onClick={() => setDeleteId(patient.id)}>
                                 <Trash2 className="h-4 w-4" /> حذف
