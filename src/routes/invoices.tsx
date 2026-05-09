@@ -77,6 +77,7 @@ type InvoiceRow = {
   paid_at: string | null;
   due_date: string;
   description: string;
+  notes: string;
   created_at: string;
 };
 
@@ -646,6 +647,7 @@ function InvoicesPage() {
                 <Row label="رقم الفاتورة" value={<span className="font-mono">{viewInvoice.invoice_number}</span>} />
                 <Row label="اسم المريض" value={p?.full_name ?? "—"} />
                 <Row label="سبب الفاتورة" value={viewInvoice.description || "فتح ملف طبي"} />
+                <Row label="السبب الخاص" value={viewInvoice.notes?.trim() ? viewInvoice.notes : "—"} />
                 <Row label="السعر" value={`$${price.toFixed(2)}`} />
                 <Row label="الخصم" value={`$${discount.toFixed(2)}`} />
                 <Row label="السعر بعد الخصم" value={<span className="font-semibold">${finalPrice.toFixed(2)}</span>} />
