@@ -422,7 +422,58 @@ function PatientsPage() {
     await loadPatients();
   }
 
-  return (
+  async function handleCreateAccount() {
+    if (!accountPatient) return;
+    const email = accountEmail.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email) || accountPassword.length < 6) {
+      toast.error("بريد غير صحيح أو كلمة المرور أقل من 6 أحرف");
+      return;
+    }
+    setSaving(true);
+    const { data, error } = await supabase.functions.invoke("create-patient-account", {
+      body: { patient_id: accountPatient.id, email, password: accountPassword },
+    });
+    setSaving(false);
+    if (error || (data as { error?: string })?.error) {
+      toast.error("تعذر إنشاء الحساب: " + (error?.message ?? (data as { error?: string })?.error ?? ""));
+      return;
+    }
+    toast.success("تم إنشاء حساب دخول للمريض");
+    setAccountPatient(null);
+    setAccountEmail("");
+    setAccountPassword("");
+    await loadPatients();
+  }
+
+  async function handleAddAppointment() {
+    if (!apptPatient || !userId) return;
+    if (!apptDoctor.trim() || !apptDateTime) {
+      toast.error("اسم الطبيب وتاريخ الموعد مطلوبان");
+      return;
+    }
+    setSaving(true);
+    const { error } = await db.from("appointments").insert({
+      user_id: userId,
+      patient_id: apptPatient.id,
+      doctor_name: apptDoctor.trim(),
+      doctor_specialty: apptSpecialty.trim(),
+      scheduled_at: new Date(apptDateTime).toISOString(),
+      notes: apptNotes.trim(),
+      status: "scheduled",
+    });
+    setSaving(false);
+    if (error) {
+      toast.error("تعذر إضافة الموعد");
+      return;
+    }
+    toast.success("تمت إضافة الموعد");
+    setApptPatient(null);
+    setApptDoctor("");
+    setApptSpecialty("");
+    setApptDateTime("");
+    setApptNotes("");
+  }
+
     <AppShell>
       <div className="space-y-6">
         <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
