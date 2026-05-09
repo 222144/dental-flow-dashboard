@@ -81,6 +81,7 @@ type PatientRow = {
   notes: string;
   status: string;
   last_visit: string;
+  account_user_id: string | null;
 };
 
 type InvoiceRow = {
