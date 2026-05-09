@@ -52,23 +52,34 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const routeForUser = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "patient")
+      .maybeSingle();
+    navigate({ to: data ? "/portal" : "/" });
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/" });
+      if (data.session) routeForUser(data.session.user.id);
     });
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) {
-      toast.error("فشل تسجيل الدخول: " + error.message);
+    if (error || !data.user) {
+      toast.error("فشل تسجيل الدخول: " + (error?.message ?? ""));
       return;
     }
     toast.success("تم تسجيل الدخول بنجاح");
-    navigate({ to: "/" });
+    await routeForUser(data.user.id);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
