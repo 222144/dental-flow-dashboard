@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, CalendarClock, FileText, LogOut, Receipt, Stethoscope, User } from "lucide-react";
 import { toast } from "sonner";
@@ -54,57 +54,28 @@ type Appointment = {
 };
 
 function PortalPage() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [email, setEmail] = useState("");
+
+  async function loadRandom() {
+    setLoading(true);
+    const { data, error } = await supabase.functions.invoke("get-random-patient");
+    if (error) {
+      toast.error("تعذر تحميل البيانات");
+      setLoading(false);
+      return;
+    }
+    setPatient((data?.patient ?? null) as Patient | null);
+    setInvoices((data?.invoices ?? []) as Invoice[]);
+    setAppointments((data?.appointments ?? []) as Appointment[]);
+    setLoading(false);
+  }
 
   useEffect(() => {
-    (async () => {
-      const { data: sess } = await supabase.auth.getSession();
-      if (!sess.session) {
-        navigate({ to: "/login" });
-        return;
-      }
-      setEmail(sess.session.user.email ?? "");
-
-      const { data: p } = await supabase
-        .from("patients")
-        .select("*")
-        .eq("account_user_id", sess.session.user.id)
-        .maybeSingle();
-
-      if (!p) {
-        setLoading(false);
-        return;
-      }
-      setPatient(p as Patient);
-
-      const [{ data: inv }, { data: appts }] = await Promise.all([
-        supabase
-          .from("patient_invoices")
-          .select("*")
-          .eq("patient_id", (p as Patient).id)
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("appointments")
-          .select("*")
-          .eq("patient_id", (p as Patient).id)
-          .order("scheduled_at", { ascending: true }),
-      ]);
-      setInvoices((inv ?? []) as Invoice[]);
-      setAppointments((appts ?? []) as Appointment[]);
-      setLoading(false);
-    })();
-  }, [navigate]);
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    toast.success("تم تسجيل الخروج");
-    navigate({ to: "/login" });
-  }
+    loadRandom();
+  }, []);
 
   const upcoming = appointments.filter((a) => new Date(a.scheduled_at) >= new Date());
   const past = appointments.filter((a) => new Date(a.scheduled_at) < new Date());
@@ -119,11 +90,11 @@ function PortalPage() {
             </div>
             <div>
               <p className="text-sm font-semibold">بوابة المريض</p>
-              <p className="text-xs text-muted-foreground">{email}</p>
+              <p className="text-xs text-muted-foreground">{patient?.full_name ?? "مريض عشوائي"}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="h-10">
-            <LogOut className="h-4 w-4" /> خروج
+          <Button variant="outline" onClick={loadRandom} className="h-10">
+            <LogOut className="h-4 w-4" /> مريض آخر
           </Button>
         </div>
       </header>
