@@ -90,11 +90,11 @@ function PortalPage() {
             </div>
             <div>
               <p className="text-sm font-semibold">بوابة المريض</p>
-              <p className="text-xs text-muted-foreground">{email}</p>
+              <p className="text-xs text-muted-foreground">{patient?.full_name ?? "مريض عشوائي"}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="h-10">
-            <LogOut className="h-4 w-4" /> خروج
+          <Button variant="outline" onClick={loadRandom} className="h-10">
+            <LogOut className="h-4 w-4" /> مريض آخر
           </Button>
         </div>
       </header>
