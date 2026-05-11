@@ -72,7 +72,7 @@ function DoctorsPage() {
       .select("*")
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    else setDoctors((data ?? []) as Doctor[]);
+    else setDoctors((data ?? []) as unknown as Doctor[]);
     setLoading(false);
   };
 
