@@ -74,6 +74,7 @@ export type Database = {
           name: string
           notes: string
           phone: string
+          schedule: Json
           specialty: string
           start_time: string
           status: string
@@ -90,6 +91,7 @@ export type Database = {
           name: string
           notes?: string
           phone?: string
+          schedule?: Json
           specialty?: string
           start_time?: string
           status?: string
@@ -106,6 +108,7 @@ export type Database = {
           name?: string
           notes?: string
           phone?: string
+          schedule?: Json
           specialty?: string
           start_time?: string
           status?: string
