@@ -64,6 +64,57 @@ export type Database = {
           },
         ]
       }
+      doctors: {
+        Row: {
+          breaks: Json
+          created_at: string
+          email: string
+          end_time: string
+          id: string
+          name: string
+          notes: string
+          phone: string
+          specialty: string
+          start_time: string
+          status: string
+          updated_at: string
+          user_id: string
+          working_days: string[]
+        }
+        Insert: {
+          breaks?: Json
+          created_at?: string
+          email?: string
+          end_time?: string
+          id?: string
+          name: string
+          notes?: string
+          phone?: string
+          specialty?: string
+          start_time?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          working_days?: string[]
+        }
+        Update: {
+          breaks?: Json
+          created_at?: string
+          email?: string
+          end_time?: string
+          id?: string
+          name?: string
+          notes?: string
+          phone?: string
+          specialty?: string
+          start_time?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          working_days?: string[]
+        }
+        Relationships: []
+      }
       patient_invoices: {
         Row: {
           amount: number
