@@ -17,6 +17,7 @@ import { Route as PatientsRouteImport } from './routes/patients'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InvoicesRouteImport } from './routes/invoices'
 import { Route as DoctorsRouteImport } from './routes/doctors'
+import { Route as DoctorPortalRouteImport } from './routes/doctor-portal'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PatientsPatientIdRouteImport } from './routes/patients.$patientId'
 
@@ -60,6 +61,11 @@ const DoctorsRoute = DoctorsRouteImport.update({
   path: '/doctors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DoctorPortalRoute = DoctorPortalRouteImport.update({
+  id: '/doctor-portal',
+  path: '/doctor-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,6 +79,7 @@ const PatientsPatientIdRoute = PatientsPatientIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/doctor-portal': typeof DoctorPortalRoute
   '/doctors': typeof DoctorsRoute
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/doctor-portal': typeof DoctorPortalRoute
   '/doctors': typeof DoctorsRoute
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/doctor-portal': typeof DoctorPortalRoute
   '/doctors': typeof DoctorsRoute
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/doctor-portal'
     | '/doctors'
     | '/invoices'
     | '/login'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/doctor-portal'
     | '/doctors'
     | '/invoices'
     | '/login'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/doctor-portal'
     | '/doctors'
     | '/invoices'
     | '/login'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DoctorPortalRoute: typeof DoctorPortalRoute
   DoctorsRoute: typeof DoctorsRoute
   InvoicesRoute: typeof InvoicesRoute
   LoginRoute: typeof LoginRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DoctorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/doctor-portal': {
+      id: '/doctor-portal'
+      path: '/doctor-portal'
+      fullPath: '/doctor-portal'
+      preLoaderRoute: typeof DoctorPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -248,6 +268,7 @@ const PatientsRouteWithChildren = PatientsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DoctorPortalRoute: DoctorPortalRoute,
   DoctorsRoute: DoctorsRoute,
   InvoicesRoute: InvoicesRoute,
   LoginRoute: LoginRoute,
@@ -260,3 +281,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
