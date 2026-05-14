@@ -198,6 +198,14 @@ function LoginPage() {
                   </form>
                 </TabsContent>
               </Tabs>
+              <div className="mt-6 grid gap-2 border-t border-border pt-4 sm:grid-cols-2">
+                <Button asChild variant="outline" className="h-11">
+                  <a href="/portal">دخول كمريض (تجريبي)</a>
+                </Button>
+                <Button asChild variant="outline" className="h-11">
+                  <a href="/doctor-portal">دخول كطبيب (تجريبي)</a>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
