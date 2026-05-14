@@ -255,6 +255,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tooth_records: {
+        Row: {
+          condition: string
+          created_at: string
+          id: string
+          notes: string
+          patient_id: string
+          tooth_number: number
+          updated_at: string
+        }
+        Insert: {
+          condition?: string
+          created_at?: string
+          id?: string
+          notes?: string
+          patient_id: string
+          tooth_number: number
+          updated_at?: string
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          id?: string
+          notes?: string
+          patient_id?: string
+          tooth_number?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
