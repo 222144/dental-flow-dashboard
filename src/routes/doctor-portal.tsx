@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CalendarClock,
+  Clock,
+  Coffee,
   FileText,
   Loader2,
   Receipt,
@@ -29,13 +31,52 @@ export const Route = createFileRoute("/doctor-portal")({
   component: DoctorPortal,
 });
 
+type Break = { start: string; end: string; label?: string };
+type DaySchedule = { start: string; end: string; breaks: Break[] };
+type Schedule = Record<string, DaySchedule>;
+
 type Doctor = {
   id: string;
   name: string;
   specialty: string;
   phone: string;
   email: string;
+  schedule?: Schedule | null;
+  working_days?: string[] | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  breaks?: Break[] | null;
 };
+
+const DAYS_ORDER = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+
+function toMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function fmtDuration(mins: number): string {
+  if (mins <= 0) return "0 س";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h && m) return `${h} س ${m} د`;
+  if (h) return `${h} س`;
+  return `${m} د`;
+}
+
+function normalizeSchedule(doctor: Doctor | null): Schedule {
+  if (!doctor) return {};
+  if (doctor.schedule && typeof doctor.schedule === "object" && Object.keys(doctor.schedule).length) {
+    return doctor.schedule as Schedule;
+  }
+  const days = doctor.working_days ?? [];
+  const start = doctor.start_time ?? "09:00";
+  const end = doctor.end_time ?? "17:00";
+  const breaks = doctor.breaks ?? [];
+  const s: Schedule = {};
+  for (const d of days) s[d] = { start, end, breaks };
+  return s;
+}
 
 type PatientLite = {
   id: string;
@@ -161,6 +202,8 @@ function DoctorPortal() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+        <DoctorScheduleCard doctor={doctor} />
+
         <Card className="rounded-lg shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="text-lg">قائمة المرضى</CardTitle>
@@ -513,5 +556,92 @@ function Info({ label, value, className = "" }: { label: string; value: string; 
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 font-semibold">{value}</p>
     </div>
+  );
+}
+
+function DoctorScheduleCard({ doctor }: { doctor: Doctor | null }) {
+  const schedule = normalizeSchedule(doctor);
+  const days = DAYS_ORDER.filter((d) => schedule[d]);
+
+  const perDay = days.map((d) => {
+    const ds = schedule[d];
+    const work = Math.max(0, toMinutes(ds.end) - toMinutes(ds.start));
+    const breakMins = (ds.breaks ?? []).reduce(
+      (s, b) => s + Math.max(0, toMinutes(b.end) - toMinutes(b.start)),
+      0,
+    );
+    return { day: d, ds, work, breakMins, net: Math.max(0, work - breakMins) };
+  });
+
+  const totalNet = perDay.reduce((s, d) => s + d.net, 0);
+  const totalBreaks = perDay.reduce((s, d) => s + d.breakMins, 0);
+
+  return (
+    <Card className="rounded-lg shadow-[var(--shadow-card)]">
+      <CardHeader className="flex-row items-center gap-3 space-y-0">
+        <CalendarClock className="h-5 w-5 text-primary" />
+        <CardTitle className="text-lg">جدول العمل الأسبوعي</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {days.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            لا يوجد جدول عمل مسجل لهذا الطبيب.
+          </p>
+        ) : (
+          <>
+            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-border bg-secondary/40 p-3">
+                <p className="text-xs text-muted-foreground">أيام العمل</p>
+                <p className="mt-1 text-lg font-bold">{days.length} أيام</p>
+              </div>
+              <div className="rounded-lg border border-border bg-secondary/40 p-3">
+                <p className="text-xs text-muted-foreground">إجمالي ساعات العمل الفعلية</p>
+                <p className="mt-1 text-lg font-bold">{fmtDuration(totalNet)}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-secondary/40 p-3">
+                <p className="text-xs text-muted-foreground">إجمالي فترات الراحة</p>
+                <p className="mt-1 text-lg font-bold">{fmtDuration(totalBreaks)}</p>
+              </div>
+            </div>
+
+            <ul className="space-y-3">
+              {perDay.map(({ day, ds, work, breakMins, net }) => (
+                <li
+                  key={day}
+                  className="rounded-lg border border-border p-3 text-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-semibold">{day}</span>
+                    <span className="inline-flex items-center gap-1 text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      {ds.start} — {ds.end}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      عمل: <b className="text-foreground">{fmtDuration(work)}</b>
+                      {" · "}راحة: <b className="text-foreground">{fmtDuration(breakMins)}</b>
+                      {" · "}صافي: <b className="text-primary">{fmtDuration(net)}</b>
+                    </span>
+                  </div>
+                  {ds.breaks && ds.breaks.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {ds.breaks.map((b, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/50 px-3 py-1 text-xs"
+                        >
+                          <Coffee className="h-3 w-3 text-amber-600" />
+                          {b.label ? `${b.label}: ` : ""}
+                          {b.start} — {b.end}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
