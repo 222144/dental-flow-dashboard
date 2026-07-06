@@ -201,8 +201,10 @@ function DoctorPortal() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
-        <DoctorScheduleCard doctor={doctor} />
+      <main className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[320px_1fr]">
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <DoctorScheduleCard doctor={doctor} />
+        </aside>
 
         <Card className="rounded-lg shadow-[var(--shadow-card)]">
           <CardHeader>
