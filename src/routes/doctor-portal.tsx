@@ -591,7 +591,7 @@ function DoctorScheduleCard({ doctor }: { doctor: Doctor | null }) {
           </p>
         ) : (
           <>
-            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+            <div className="mb-4 grid gap-3 grid-cols-1">
               <div className="rounded-lg border border-border bg-secondary/40 p-3">
                 <p className="text-xs text-muted-foreground">أيام العمل</p>
                 <p className="mt-1 text-lg font-bold">{days.length} أيام</p>
