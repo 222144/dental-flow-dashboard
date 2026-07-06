@@ -31,13 +31,52 @@ export const Route = createFileRoute("/doctor-portal")({
   component: DoctorPortal,
 });
 
+type Break = { start: string; end: string; label?: string };
+type DaySchedule = { start: string; end: string; breaks: Break[] };
+type Schedule = Record<string, DaySchedule>;
+
 type Doctor = {
   id: string;
   name: string;
   specialty: string;
   phone: string;
   email: string;
+  schedule?: Schedule | null;
+  working_days?: string[] | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  breaks?: Break[] | null;
 };
+
+const DAYS_ORDER = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+
+function toMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function fmtDuration(mins: number): string {
+  if (mins <= 0) return "0 س";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h && m) return `${h} س ${m} د`;
+  if (h) return `${h} س`;
+  return `${m} د`;
+}
+
+function normalizeSchedule(doctor: Doctor | null): Schedule {
+  if (!doctor) return {};
+  if (doctor.schedule && typeof doctor.schedule === "object" && Object.keys(doctor.schedule).length) {
+    return doctor.schedule as Schedule;
+  }
+  const days = doctor.working_days ?? [];
+  const start = doctor.start_time ?? "09:00";
+  const end = doctor.end_time ?? "17:00";
+  const breaks = doctor.breaks ?? [];
+  const s: Schedule = {};
+  for (const d of days) s[d] = { start, end, breaks };
+  return s;
+}
 
 type PatientLite = {
   id: string;
