@@ -202,6 +202,8 @@ function DoctorPortal() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+        <DoctorScheduleCard doctor={doctor} />
+
         <Card className="rounded-lg shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="text-lg">قائمة المرضى</CardTitle>
